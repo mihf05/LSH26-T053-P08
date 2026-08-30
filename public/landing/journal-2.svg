@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 200" width="330" height="200" role="img"
+     aria-label="R-12: an absence prints AB, scores 0.00 and cancels the result to F.">
+  <style>
+    .t { font-family: "Radio Canada Big", ui-sans-serif, system-ui, sans-serif; }
+    .m { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  </style>
+  <rect width="330" height="200" fill="#f6f8fb"/>
+  <text class="m" x="22" y="34" font-size="13" fill="#6c6c6c">R-12 · ABSENT IN A COMPULSORY SUBJECT</text>
+
+  <rect x="22" y="52" width="132" height="94" rx="10" fill="#fff546" stroke="#000" stroke-width="2"/>
+  <text class="t" x="88" y="118" font-size="54" font-weight="600" fill="#000" text-anchor="middle">AB</text>
+
+  <text class="m" x="176" y="76" font-size="13" fill="#6c6c6c">GRADE POINT</text>
+  <text class="t" x="176" y="106" font-size="30" font-weight="600" fill="#000">0.00</text>
+  <text class="m" x="176" y="132" font-size="13" fill="#6c6c6c">OVERALL</text>
+  <rect x="248" y="86" width="60" height="60" rx="10" fill="#000"/>
+  <text class="t" x="278" y="130" font-size="34" font-weight="600" fill="#fff" text-anchor="middle">F</text>
+
+  <text class="m" x="22" y="180" font-size="13" fill="#000">No mark to use — the result cancels</text>
+</svg>

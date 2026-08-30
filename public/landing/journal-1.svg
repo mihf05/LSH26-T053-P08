@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 200" width="330" height="200" role="img"
+     aria-label="R-11: theory 25 of 75 and practical 8 of 25 are separate pass marks; failing either fails the subject.">
+  <style>
+    .t { font-family: "Radio Canada Big", ui-sans-serif, system-ui, sans-serif; }
+    .m { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  </style>
+  <rect width="330" height="200" fill="#eaf1fb"/>
+  <text class="m" x="22" y="34" font-size="13" fill="#6c6c6c">R-11 · TWO PARTS, TWO PASS MARKS</text>
+
+  <text class="t" x="22" y="72" font-size="15" font-weight="600" fill="#000">Theory</text>
+  <text class="m" x="308" y="72" font-size="14" fill="#000" text-anchor="end">65 / 75</text>
+  <rect x="22" y="82" width="286" height="12" rx="6" fill="#fff"/>
+  <rect x="22" y="82" width="248" height="12" rx="6" fill="#000"/>
+  <rect x="117" y="78" width="2" height="20" fill="#2683EB"/>
+
+  <text class="t" x="22" y="130" font-size="15" font-weight="600" fill="#000">Practical</text>
+  <text class="m" x="308" y="130" font-size="14" fill="#000" text-anchor="end">5 / 25</text>
+  <rect x="22" y="140" width="286" height="12" rx="6" fill="#fff"/>
+  <rect x="22" y="140" width="57" height="12" rx="6" fill="#fff546" stroke="#000" stroke-width="1.5"/>
+  <rect x="113" y="136" width="2" height="20" fill="#2683EB"/>
+
+  <text class="m" x="22" y="180" font-size="13" fill="#000">Practical 5 &lt; 8 → subject 0.00</text>
+</svg>

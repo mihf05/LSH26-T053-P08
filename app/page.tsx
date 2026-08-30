@@ -55,19 +55,19 @@ const VALUES = [
 
 const JOURNAL = [
   {
-    image: "journal-1.png",
+    image: "journal-1.svg",
     title: "Failing either part fails the whole subject",
     tag: "R-11",
     read: "2 min",
   },
   {
-    image: "journal-2.png",
+    image: "journal-2.svg",
     title: "What an absence does to the optional subject",
     tag: "R-12",
     read: "3 min",
   },
   {
-    image: "journal-3.png",
+    image: "journal-3.svg",
     title: "Why a 74.43 average can still come out as F",
     tag: "R-13",
     read: "4 min",
@@ -206,139 +206,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ---------------------------------------------------------------- */}
-      {/* Case study section (1:314)                                        */}
-      {/* ---------------------------------------------------------------- */}
-      <section className="flex w-full flex-col items-center px-[20px] py-[40px] sm:py-[80px] lg:py-[120px]">
-        <div className="flex w-full max-w-[980px] flex-col items-center gap-[40px] rounded-[16px] bg-[#f6f8fb] p-[20px] md:flex-row">
-          <div className="relative aspect-[498/280] w-full rounded-[8px] md:aspect-auto md:h-[280px] md:flex-1 lg:w-[498px] lg:flex-none">
-            <img
-              src={asset("case-study.png")}
-              alt="Teachers going through a class mark sheet together"
-              className="absolute inset-0 size-full rounded-[8px] object-cover"
-            />
-          </div>
-          <div className="flex w-full flex-col items-start gap-[32px] md:flex-1 lg:w-[403px] lg:flex-none">
-            <div className="flex w-full flex-col items-start gap-[16px] text-[18px] text-black sm:text-[20px]">
-              <h2 className="font-display w-full leading-none font-medium tracking-[-0.02em]">
-                Why the office checks 31 students by hand
-              </h2>
-              <p className="font-serif-display w-full leading-[1.2] tracking-[-0.04em]">
-                Across 64 students in two classes, a rule changed the printed
-                result for 31 of them. The engine names each one, the rule that
-                did it, and exactly what a teacher should verify before results
-                go out.
-              </p>
-            </div>
-            <ButtonSecondary
-              href="/dashboard"
-              label="Open the dashboard"
-              className="w-full sm:w-auto"
-            />
-          </div>
-        </div>
-      </section>
 
-      {/* ---------------------------------------------------------------- */}
-      {/* Journal section (1:322)                                           */}
-      {/* ---------------------------------------------------------------- */}
-      <section className="flex w-full flex-col items-center gap-[40px] px-[20px]">
-        <h2 className="font-display w-full max-w-[612px] text-center text-[24px] leading-none font-medium tracking-[-0.03em] text-black sm:text-[32px] lg:text-[40px]">
-          From the rulebook
-        </h2>
-        <div className="relative flex w-full max-w-[620px] flex-col items-center gap-[24px]">
-          {/* Sticker (1:330): rotated, hanging off the left of the list. */}
-          <div
-            className="pointer-events-none absolute top-[-109px] left-[-287px] hidden h-[221.12px] w-[420.665px] items-center justify-center xl:flex"
-            aria-hidden
-          >
-            <span className="block -rotate-10">
-              <img
-                src={asset("sticker.svg")}
-                alt=""
-                width={400}
-                height={154}
-                className="block h-[154px] w-[400px]"
-              />
-            </span>
-          </div>
 
-          <div className="flex w-full flex-col items-start">
-            {JOURNAL.map((item, i) => (
-              <article
-                key={item.title}
-                className={`flex w-full items-start border-b border-solid border-[#dbe0ec] ${
-                  i === 0 ? "border-t" : ""
-                }`}
-              >
-                <div className="flex w-full flex-col items-start justify-between gap-[16px] py-[24px] sm:flex-row sm:gap-0">
-                  <div className="relative h-[100px] w-[165px] shrink-0">
-                    <img
-                      src={asset(item.image)}
-                      alt=""
-                      className="absolute inset-0 size-full object-cover"
-                    />
-                  </div>
-                  <div className="flex w-full flex-col items-start gap-[8px] leading-none sm:w-[439px]">
-                    <h3 className="font-display w-full text-[18px] font-medium tracking-[-0.02em] text-black sm:text-[20px]">
-                      {item.title}
-                    </h3>
-                    <div className="flex items-start gap-[8px] font-mono text-[14px] whitespace-nowrap text-[#6c6c6c]">
-                      <span>{item.tag}</span>
-                      <span>·</span>
-                      <span>{item.read}</span>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-          <ButtonSecondary
-            href="/rules"
-            label="View all rules"
-            className="w-full sm:w-auto"
-          />
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------------------- */}
-      {/* Testimonial section (1:369)                                       */}
-      {/* ---------------------------------------------------------------- */}
-      <section className="flex w-full items-start justify-center px-[20px] py-[40px] sm:py-[80px] lg:py-[120px]">
-        <div className="flex w-full max-w-[1500px] min-w-px flex-1 flex-col items-center gap-[16px] md:flex-row">
-          <div className="relative aspect-[612/700] w-full shrink-0 md:w-[calc(50%-8px)]">
-            <img
-              src={asset("testimonial.png")}
-              alt="A student reading their result sheet"
-              className="absolute inset-0 size-full object-cover"
-            />
-          </div>
-          <div className="flex w-full min-w-px flex-1 flex-col items-start justify-center gap-[32px] sm:gap-[56px] md:px-[40px] lg:px-[105px]">
-            <img
-              src={asset("quotation.svg")}
-              alt=""
-              width={24}
-              height={20}
-              className="block h-[20px] w-[24px] shrink-0"
-              aria-hidden
-            />
-            <blockquote className="font-display w-full text-[24px] leading-none font-medium tracking-[-0.03em] text-black sm:text-[32px] lg:text-[40px]">
-              Any compulsory failure gives GPA 0.00 and letter F; the
-              uncancelled average stays visible in the calculation trace.
-            </blockquote>
-            <div className="flex w-full flex-col items-start gap-[8px] text-[18px] sm:text-[20px]">
-              <p className="font-display w-full leading-none font-medium tracking-[-0.02em] text-black">
-                Rule R-13
-              </p>
-              <p className="font-serif-display w-full leading-[1.2] tracking-[-0.04em] text-[#6c6c6c]">
-                Marking rules, Class 10 result processing
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------------------- */}
+          {/* ---------------------------------------------------------------- */}
       {/* Call to action (1:378)                                            */}
       {/* ---------------------------------------------------------------- */}
       <aside className="flex w-full flex-col items-center gap-[32px] bg-[#f6f8fb] px-[20px] py-[40px] sm:py-[80px] lg:py-[120px]">

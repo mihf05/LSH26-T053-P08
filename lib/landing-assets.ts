@@ -57,7 +57,7 @@ export const LANDING_ASSETS: LandingAsset[] = [
     description: "Case study image",
   },
   {
-    file: "journal-1.png",
+    file: "journal-1.svg",
     id: "a018e601-a6eb-4d7b-825c-01db7a47f151",
     format: "png",
     width: 165,
@@ -66,7 +66,7 @@ export const LANDING_ASSETS: LandingAsset[] = [
     description: "Journal item 1 thumbnail",
   },
   {
-    file: "journal-2.png",
+    file: "journal-2.svg",
     id: "ce8b5eae-653f-48b8-8b4f-5d565d1c0e29",
     format: "png",
     width: 165,
@@ -75,7 +75,7 @@ export const LANDING_ASSETS: LandingAsset[] = [
     description: "Journal item 2 thumbnail",
   },
   {
-    file: "journal-3.png",
+    file: "journal-3.svg",
     id: "f24e9bcf-d8dd-4197-80b6-1d17fa81ae20",
     format: "png",
     width: 165,

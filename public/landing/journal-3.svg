@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 200" width="330" height="200" role="img"
+     aria-label="R-13: a 74.43 average and a 4.50 uncancelled GPA still come out as 0.00 and F.">
+  <style>
+    .t { font-family: "Radio Canada Big", ui-sans-serif, system-ui, sans-serif; }
+    .m { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  </style>
+  <rect width="330" height="200" fill="#fff4df"/>
+  <text class="m" x="22" y="34" font-size="13" fill="#6c6c6c">R-13 · ONE FAILURE CANCELS THE GPA</text>
+
+  <text class="m" x="22" y="70" font-size="13" fill="#6c6c6c">AVERAGE 74.43</text>
+  <text class="t" x="22" y="122" font-size="44" font-weight="600" fill="#000">4.50</text>
+  <text class="m" x="22" y="144" font-size="12" fill="#6c6c6c">uncancelled</text>
+
+  <path d="M150 106 h34 m-9 -7 l9 7 -9 7" stroke="#000" stroke-width="2.5" fill="none"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <rect x="204" y="62" width="104" height="90" rx="10" fill="#000"/>
+  <text class="t" x="256" y="112" font-size="30" font-weight="600" fill="#fff" text-anchor="middle">0.00</text>
+  <text class="m" x="256" y="134" font-size="14" fill="#fff546" text-anchor="middle">LETTER F</text>
+
+  <text class="m" x="22" y="180" font-size="13" fill="#000">Mathematics 29 &lt; 33 did it</text>
+</svg>
