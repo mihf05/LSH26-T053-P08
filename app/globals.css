@@ -1,0 +1,28 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: corporate --default, business --prefersdark;
+}
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* The rule column of a trace is prose, not data -- keep it readable but quiet. */
+.rule-text {
+  font-size: 0.78rem;
+  line-height: 1.15rem;
+  opacity: 0.85;
+}
+
+/* Mark sheet tables are dense; tighten the default daisyUI cell padding. */
+.table-tight :where(th, td) {
+  padding-top: 0.45rem;
+  padding-bottom: 0.45rem;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
