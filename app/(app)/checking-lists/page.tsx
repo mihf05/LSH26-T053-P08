@@ -1,182 +1,88 @@
-import Link from "next/link";
-import { GradeBadge } from "@/components/GradeBadge";
-import { formatGpa, type StudentResult } from "@/lib/grading";
+import { ListSection } from "@/components/ListSection";
 import { getCheckingLists } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Checking lists | Result Processing" };
 
-function ListSection({
-  id,
-  title,
-  rule,
-  description,
-  rows,
-  detail,
-  tone,
-}: {
-  id: string;
-  title: string;
-  rule: string;
-  description: string;
-  rows: StudentResult[];
-  detail: (r: StudentResult) => React.ReactNode;
-  tone: string;
-}) {
-  return (
-    <section id={id} className="card bg-base-100 border border-base-300">
-      <div className="card-body gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <h2 className="card-title text-base">{title}</h2>
-          <span className={`badge badge-sm ${tone}`}>
-            {rows.length} students
-          </span>
-          <span className="badge badge-sm badge-ghost font-mono">{rule}</span>
-        </div>
-        <p className="text-sm opacity-70">{description}</p>
-        <div className="overflow-x-auto">
-          <table className="table table-sm table-tight">
-            <thead>
-              <tr>
-                <th className="w-16">Roll</th>
-                <th>Student</th>
-                <th>Class</th>
-                <th className="text-right">GPA</th>
-                <th className="w-16">Grade</th>
-                <th>What to verify</th>
-                <th className="w-28">Also on</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.student.id} className="hover">
-                  <td className="font-mono text-xs opacity-70">
-                    {r.student.roll}
-                  </td>
-                  <td>
-                    <Link
-                      href={`/students/${r.student.id}`}
-                      className="link link-hover font-medium whitespace-nowrap"
-                    >
-                      {r.student.name}
-                    </Link>
-                  </td>
-                  <td className="text-xs opacity-70">{r.student.className}</td>
-                  <td className="text-right font-mono">{formatGpa(r.gpa)}</td>
-                  <td>
-                    <GradeBadge letter={r.letter} size="xs" />
-                  </td>
-                  <td className="rule-text max-w-lg">{detail(r)}</td>
-                  <td>
-                    <div className="flex flex-wrap gap-1">
-                      {r.flags.optionalDidNotHelp && id !== "optional" && (
-                        <span className="badge badge-xs badge-warning badge-outline">
-                          opt
-                        </span>
-                      )}
-                      {r.flags.practicalFail && id !== "practical" && (
-                        <span className="badge badge-xs badge-error badge-outline">
-                          prac
-                        </span>
-                      )}
-                      {r.flags.absent && id !== "absent" && (
-                        <span className="badge badge-xs badge-neutral">AB</span>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {rows.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={7}
-                    className="py-6 text-center text-sm opacity-60"
-                  >
-                    Nobody on this list.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export default async function CheckingListsPage() {
   const lists = await getCheckingLists();
 
   return (
-    <div className="flex flex-col gap-5">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold">Checking lists</h1>
-        <p className="max-w-3xl text-sm opacity-70">
-          Every student whose printed result was changed by the optional subject
-          rule, by a practical fail, or by an absent mark. A teacher should
-          verify these {lists.any.length} students by hand before the results go
-          out. A student can appear on more than one list (R-29).
-        </p>
-        <div className="mt-2 flex flex-wrap gap-2 no-print">
-          <a href="#optional" className="btn btn-xs btn-outline">
-            Optional rule ({lists.optional.length})
-          </a>
-          <a href="#practical" className="btn btn-xs btn-outline">
-            Practical fail ({lists.practicalFail.length})
-          </a>
-          <a href="#absent" className="btn btn-xs btn-outline">
-            Absent ({lists.absent.length})
-          </a>
+    <div className="flex flex-col gap-10">
+      {/* Page Header Banner */}
+      <div className="relative overflow-hidden rounded-lg border border-base-300 bg-base-100 p-8 sm:p-10 shadow-xs top-gradient-border">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center rounded-md bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-700 dark:text-amber-300">
+              Audit & Compliance
+            </span>
+            <span className="text-xs text-base-content/60 font-medium">
+              Rule R-29 Verification
+            </span>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">
+            Administrative Checking Lists
+          </h1>
+          <p className="max-w-3xl text-sm opacity-75 leading-relaxed">
+            Manual verification queues for student records affected by optional subject thresholds, practical failure penalties, or absentee markers. Teachers should verify these{" "}
+            <span className="font-bold text-base-content">{lists.any.length} students</span> before printing formal grade reports.
+          </p>
+
+          <div className="mt-3 flex flex-wrap gap-3 no-print">
+            <a
+              href="#optional"
+              className="btn btn-sm rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 hover:bg-amber-500/20 transition-colors duration-200"
+            >
+              Optional Rule List ({lists.optional.length})
+            </a>
+            <a
+              href="#practical"
+              className="btn btn-sm rounded-md bg-rose-500/10 border border-rose-500/30 text-rose-900 dark:text-rose-200 hover:bg-rose-500/20 transition-colors duration-200"
+            >
+              Practical Fail List ({lists.practicalFail.length})
+            </a>
+            <a
+              href="#absent"
+              className="btn btn-sm rounded-md bg-slate-500/10 border border-slate-500/30 text-slate-900 dark:text-slate-200 hover:bg-slate-500/20 transition-colors duration-200"
+            >
+              Absentee List ({lists.absent.length})
+            </a>
+          </div>
         </div>
-      </header>
+      </div>
 
       <ListSection
         id="optional"
-        title="Optional subject rule"
+        title="1. Optional Subject Threshold List"
         rule="R-29"
-        tone="badge-warning"
-        description="Every student whose optional grade point is 2.00 or below, so max(0, optional - 2) added nothing to the GPA. An absent optional counts here too."
+        toneClass="border-amber-500/30"
+        badgeBg="bg-amber-500/15 text-amber-700 dark:text-amber-300"
+        description="Students whose optional grade point is 2.00 or below. The formula max(0, optional - 2) contributed 0 bonus points toward their overall GPA. Absent optional subjects are also indexed here."
         rows={lists.optional}
-        detail={(r) =>
-          r.optional?.isAbsent
-            ? `${r.optional.subject.name}: AB, grade point 0.00, bonus 0.00`
-            : `${r.optional?.subject.name}: ${r.optional?.displayMark} marks, grade point ${r.optionalGradePoint.toFixed(2)}, bonus max(0, ${r.optionalGradePoint.toFixed(2)} - 2) = 0.00`
-        }
+        type="optional"
       />
 
       <ListSection
         id="practical"
-        title="Practical fail"
+        title="2. Practical Component Failure List"
         rule="R-29"
-        tone="badge-error"
-        description="Every student with a practical part below 8 in any subject. The whole subject scores 0 even where the theory mark passed, so these marks are worth re-checking against the practical register."
+        toneClass="border-rose-500/30"
+        badgeBg="bg-rose-500/15 text-rose-700 dark:text-rose-300"
+        description="Students scoring below the practical pass threshold (<8) in any subject. The subject receives 0 grade points despite passing theory marks. Recommended for re-checking practical mark registers."
         rows={lists.practicalFail}
-        detail={(r) =>
-          r.practicalFailures
-            .map(
-              (s) =>
-                `${s.subject.name}: practical ${s.practicalMark}/${s.subject.practicalFull} (pass ${s.subject.practicalPass}), theory ${s.theoryMark}/${s.subject.theoryFull} passed`,
-            )
-            .join("; ")
-        }
+        type="practical"
       />
 
       <ListSection
         id="absent"
-        title="Absent marks"
+        title="3. Absentee Verification List"
         rule="R-29"
-        tone="badge-neutral"
-        description="Every student with AB in any subject. An absence in a compulsory subject makes the overall result F; an absence in the optional subject simply contributes 0."
+        toneClass="border-slate-500/30"
+        badgeBg="bg-slate-500/15 text-slate-700 dark:text-slate-300"
+        description="Students marked AB (Absent) in one or more subjects. An absence in a compulsory subject cancels the entire result to F, while an absence in an optional subject contributes 0 bonus."
         rows={lists.absent}
-        detail={(r) =>
-          r.absences
-            .map(
-              (s) =>
-                `${s.subject.name} (${s.subject.isOptional ? "optional: contributes 0" : "compulsory: result F"})`,
-            )
-            .join("; ")
-        }
+        type="absent"
       />
     </div>
   );

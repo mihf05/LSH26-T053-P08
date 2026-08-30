@@ -1,44 +1,9 @@
 @import "tailwindcss";
-/* All 35 daisyUI themes are enabled so the picker in the navbar can offer
-   every one of them. corporate is the default; business is used when the
-   browser asks for dark and the reader has not chosen a theme yet. */
+/* Black (Dark) theme default, with Light theme toggle option. */
 @plugin "daisyui" {
   themes:
-    corporate --default,
-    business --prefersdark,
-    light,
-    dark,
-    abyss,
-    acid,
-    aqua,
-    autumn,
-    black,
-    bumblebee,
-    caramellatte,
-    cmyk,
-    coffee,
-    cupcake,
-    cyberpunk,
-    dim,
-    dracula,
-    emerald,
-    fantasy,
-    forest,
-    garden,
-    halloween,
-    lemonade,
-    lofi,
-    luxury,
-    night,
-    nord,
-    pastel,
-    retro,
-    silk,
-    sunset,
-    synthwave,
-    valentine,
-    winter,
-    wireframe;
+    black --default,
+    light;
 }
 
 @theme {
@@ -52,17 +17,98 @@
     var(--font-radio-canada-big), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* The rule column of a trace is prose, not data -- keep it readable but quiet. */
+/* Glassmorphism & Card Styles */
+.glass-card {
+  background: var(--color-base-100);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--color-base-300);
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Ambient Subtle Background Grid Pattern */
+.bg-grid-pattern {
+  background-image: radial-gradient(rgba(120, 119, 198, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Glowing Status Indicator Animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.15);
+  }
+}
+
+.status-dot-pulse {
+  animation: pulse-glow 2.5s infinite ease-in-out;
+}
+
+.card-hover {
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+.card-hover:hover {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.07);
+}
+
+/* Gradient Text & Highlights */
+.gradient-text {
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-bg-primary {
+  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+}
+
+.gradient-bg-accent {
+  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+}
+
+/* Top Accent Line for Modern Stat Cards */
+.top-gradient-border {
+  position: relative;
+  overflow: hidden;
+}
+.top-gradient-border::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #6366f1, #8b5cf6);
+}
+
+/* The rule column of a trace is prose, not data -- keep it crisp and readable. */
 .rule-text {
   font-size: 0.78rem;
   line-height: 1.15rem;
-  opacity: 0.85;
+  opacity: 0.95;
 }
 
-/* Mark sheet tables are dense; tighten the default daisyUI cell padding. */
+/* Mark sheet tables are dense; tighten cell padding & add clean high-contrast borders. */
 .table-tight :where(th, td) {
-  padding-top: 0.45rem;
-  padding-bottom: 0.45rem;
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+}
+
+.table-modern {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-modern th {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.9;
+  border-bottom: 2px solid var(--color-base-300);
 }
 
 @media print {
@@ -70,3 +116,4 @@
     display: none !important;
   }
 }
+
