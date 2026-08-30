@@ -1,29 +1,24 @@
 import Link from "next/link";
-import { GradeBadge } from "@/components/GradeBadge";
 import { StatCard } from "@/components/StatCard";
+import { GpaDistributionChart } from "@/components/GpaDistributionChart";
+import { ClassSummaryCard } from "@/components/ClassSummaryCard";
+import { EdgeCasesSection } from "@/components/EdgeCasesSection";
+import { StudentsTable, type StudentRowView } from "@/components/StudentsTable";
 import { formatGpa } from "@/lib/grading";
 import { getResultSet } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
-const LETTERS = ["A+", "A", "A-", "B", "C", "D", "F"];
+export const metadata = {
+  title: "GradePoint — School Result Processing and GPA Engine",
+  description:
+    "Grade points, GPAs, per student calculation traces and the office checking lists, computed from raw marks and traceable to a rule.",
+};
 
 export default async function DashboardPage() {
-  const { classes, results, subjectsByClass } = await getResultSet();
+  const { classes, results } = await getResultSet();
 
   const passed = results.filter((r) => r.passed);
-  const failed = results.filter((r) => !r.passed);
-  const distribution = LETTERS.map((letter) => ({
-    letter,
-    count: results.filter((r) => r.letter === letter).length,
-  }));
-  const maxCount = Math.max(...distribution.map((d) => d.count), 1);
-
-  const flagged = {
-    optional: results.filter((r) => r.flags.optionalDidNotHelp).length,
-    practical: results.filter((r) => r.flags.practicalFail).length,
-    absent: results.filter((r) => r.flags.absent).length,
-  };
 
   const gpaOfPassing = passed.map((r) => r.gpa);
   const averageGpa =
@@ -33,48 +28,103 @@ export default async function DashboardPage() {
 
   const edgeCases = results.filter((r) => r.student.edgeCaseNote);
 
-  return (
-    <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold">Result summary</h1>
-        <p className="max-w-3xl text-sm opacity-70">
-          {results.length} students across {classes.length} classes, six
-          compulsory subjects and one optional subject each. Grade points, GPAs
-          and the office checking lists below are all computed from the raw
-          marks every time this page is loaded.
-        </p>
-      </header>
+  const rows: StudentRowView[] = results.map((r) => ({
+    id: r.student.id,
+    roll: r.student.roll,
+    name: r.student.name,
+    className: r.student.className,
+    classId: r.student.classId,
+    gpa: formatGpa(r.gpa),
+    uncancelledGpa: formatGpa(r.uncancelledGpa),
+    letter: r.letter,
+    passed: r.passed,
+    averageMark: r.averageMark,
+    optionalGradePoint: r.optionalGradePoint,
+    optionalBonus: r.optionalBonus.toFixed(2),
+    flags: r.flags,
+    failedSubjects: r.failedCompulsory.map((s) => s.subject.name),
+  }));
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+  return (
+    <div className="flex flex-col gap-10">
+      {/* Executive Hero Banner */}
+      <div className="relative overflow-hidden rounded-lg border border-base-300 bg-base-100 p-8 sm:p-10 shadow-xs top-gradient-border">
+        <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                <span className="size-2 rounded-full bg-primary status-dot-pulse" />
+                Executive Dashboard
+              </span>
+              <span className="text-xs text-base-content/60 font-medium">
+                Rule Engine v2.4 Active
+              </span>
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">
+              School Result Processing System
+            </h1>
+            <p className="max-w-2xl text-sm opacity-75 leading-relaxed">
+              Real-time GPA computation, subject mark verification, and administrative audit tracing for{" "}
+              <span className="font-bold text-base-content">{results.length} enrolled students</span> across{" "}
+              <span className="font-bold text-base-content">{classes.length} academic classes</span>.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="#student-roster"
+              className="btn btn-primary btn-sm rounded-md shadow-xs gap-2 transition-colors duration-200"
+            >
+              Quick Search Roster
+              <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </Link>
+            <Link
+              href="/rules"
+              className="btn btn-outline btn-sm rounded-md transition-colors duration-200"
+            >
+              Rule Specification
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Modern Metric KPI Cards Grid */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Students"
+          label="Total Students Enrolled"
           value={results.length}
-          hint={`${classes.length} classes`}
+          hint={`${classes.length} Academic Cohorts`}
+          icon={
+            <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          }
         />
         <StatCard
-          label="Passed"
+          label="Passed Cohort"
           value={passed.length}
-          tone="text-success"
-          hint={`${Math.round((passed.length / results.length) * 100)}% pass rate`}
+          tone="text-emerald-600 dark:text-emerald-400"
+          hint={`${Math.round((passed.length / results.length) * 100)}% Overall Pass Rate`}
+          icon={
+            <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          }
         />
         <StatCard
-          label="Failed"
-          value={failed.length}
-          tone="text-error"
-          hint="any compulsory failure"
-        />
-        <StatCard
-          label="GPA 5.00"
-          value={results.filter((r) => r.letter === "A+").length}
-          hint="capped at 5.00 (R-13)"
-        />
-        <StatCard
-          label="Average GPA"
+          label="Mean Passing GPA"
           value={formatGpa(averageGpa)}
-          hint="of the students who passed"
+          tone="text-primary"
+          hint="Calculated across passing students"
+          icon={
+            <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+          }
         />
         <StatCard
-          label="To check by hand"
+          label="Audit Check Flags"
           value={
             results.filter(
               (r) =>
@@ -83,137 +133,54 @@ export default async function DashboardPage() {
                 r.flags.absent,
             ).length
           }
-          tone="text-warning"
-          hint="on at least one list"
+          tone="text-amber-600 dark:text-amber-400"
+          hint="Requires teacher verification"
+          icon={
+            <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          }
         />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <section className="card bg-base-100 border border-base-300">
-          <div className="card-body gap-4">
-            <h2 className="card-title text-base">Letter grade distribution</h2>
-            <div className="flex flex-col gap-2">
-              {distribution.map((d) => (
-                <div key={d.letter} className="flex items-center gap-3">
-                  <span className="w-8 shrink-0">
-                    <GradeBadge letter={d.letter} size="sm" />
-                  </span>
-                  <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-base-200">
-                    <div
-                      className={`h-full rounded-full ${d.letter === "F" ? "bg-error" : "bg-primary"}`}
-                      style={{ width: `${(d.count / maxCount) * 100}%` }}
-                    />
-                  </div>
-                  <span className="w-8 shrink-0 text-right font-mono text-sm">
-                    {d.count}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+      {/* Analytics Grid: Visual GPA Chart + Class Summaries */}
+      <div className="grid gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <GpaDistributionChart results={results} />
+        </div>
 
-        <section className="card bg-base-100 border border-base-300">
-          <div className="card-body gap-4">
-            <h2 className="card-title text-base">Classes</h2>
-            <div className="flex flex-col gap-3">
-              {classes.map((cls) => {
-                const inClass = results.filter(
-                  (r) => r.student.classId === cls.id,
-                );
-                const subjects = subjectsByClass.get(cls.id) ?? [];
-                const optional = subjects.find((s) => s.isOptional);
-                const classPassed = inClass.filter((r) => r.passed);
-                return (
-                  <div
-                    key={cls.id}
-                    className="rounded-box border border-base-300 p-3"
-                  >
-                    <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <h3 className="font-semibold">{cls.name}</h3>
-                      <span className="text-xs opacity-60">
-                        {inClass.length} students &middot; {classPassed.length}{" "}
-                        passed
-                      </span>
-                    </div>
-                    <p className="mt-1 text-xs opacity-70">
-                      Compulsory:{" "}
-                      {subjects
-                        .filter((s) => !s.isOptional)
-                        .map((s) => s.name)
-                        .join(", ")}
-                    </p>
-                    <p className="mt-1 text-xs opacity-70">
-                      Optional (fourth subject): {optional?.name ?? "-"}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-            <Link href="/students" className="btn btn-sm btn-primary w-fit">
-              Open the student list
-            </Link>
+        <div className="flex flex-col gap-5">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-bold text-base-content">Classes Breakdown</h3>
+            <span className="text-xs font-semibold text-base-content/60 font-mono">
+              {classes.length} Active
+            </span>
           </div>
-        </section>
-      </div>
-
-      <section className="card bg-base-100 border border-base-300">
-        <div className="card-body gap-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="card-title text-base">
-              Hard edge cases in the cohort
-            </h2>
-            <Link href="/checking-lists" className="btn btn-sm btn-outline">
-              Checking lists ({flagged.optional} / {flagged.practical} /{" "}
-              {flagged.absent})
-            </Link>
-          </div>
-          <p className="text-sm opacity-70">
-            These {edgeCases.length} students were placed deliberately: each one
-            sits on a boundary the rules have to get right. Open a student to
-            see the rule that decided every subject.
-          </p>
-          <div className="overflow-x-auto">
-            <table className="table table-sm table-tight">
-              <thead>
-                <tr>
-                  <th>Student</th>
-                  <th>Class</th>
-                  <th className="text-right">GPA</th>
-                  <th>Grade</th>
-                  <th>Why it is an edge case</th>
-                </tr>
-              </thead>
-              <tbody>
-                {edgeCases.map((r) => (
-                  <tr key={r.student.id} className="hover">
-                    <td className="whitespace-nowrap">
-                      <Link
-                        href={`/students/${r.student.id}`}
-                        className="link link-hover font-medium"
-                      >
-                        {r.student.name}
-                      </Link>
-                      <span className="block text-xs opacity-60">
-                        Roll {r.student.roll}
-                      </span>
-                    </td>
-                    <td className="text-xs opacity-70">
-                      {r.student.className}
-                    </td>
-                    <td className="text-right font-mono">{formatGpa(r.gpa)}</td>
-                    <td>
-                      <GradeBadge letter={r.letter} />
-                    </td>
-                    <td className="max-w-xl text-xs opacity-80">
-                      {r.student.edgeCaseNote}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="flex flex-col gap-4">
+            {classes.map((cls) => (
+              <ClassSummaryCard key={cls.id} className={cls.name} results={results} />
+            ))}
           </div>
         </div>
+      </div>
+
+      {/* Boundary & Edge Case Verification Card */}
+      <EdgeCasesSection
+        edgeCases={edgeCases}
+        flaggedCount={results.filter((r) => r.flags.optionalDidNotHelp || r.flags.practicalFail || r.flags.absent).length}
+      />
+
+      {/* Main Student Registry Section */}
+      <section id="student-roster" className="scroll-mt-20 flex flex-col gap-6">
+        <div className="flex flex-col gap-2">
+          <h2 className="text-2xl font-bold text-base-content">
+            Full Student Roster & Transcript Registry
+          </h2>
+          <p className="text-xs text-base-content/60">
+            Interactive filtering by class, status, or name search with instant rule trace access
+          </p>
+        </div>
+        <StudentsTable rows={rows} classes={classes} />
       </section>
     </div>
   );
