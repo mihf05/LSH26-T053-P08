@@ -115,3 +115,15 @@ assertions.
 - `/students/[id]` — the full trace for one student
 - `/checking-lists` — the three lists, with what to verify on each row
 - `/rules` — the rules and both grade tables
+
+## Themes
+
+All 35 daisyUI themes are enabled. The picker in the navbar lists every one of
+them with a live four-colour swatch, and the choice is remembered in
+`localStorage`. An inline script in `app/layout.tsx` applies the remembered
+theme before the first paint, so navigating does not flash the default.
+
+`lib/themes.ts` holds the list; it must stay in step with the `themes:` line in
+`app/globals.css`, since a name in the picker that is not enabled in the CSS
+falls back to the default theme. The default is `corporate`, with `business`
+used when the browser asks for dark and the reader has not chosen one.

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { THEME_ATTRIBUTE, THEME_STORAGE_KEY } from "@/lib/themes";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -26,7 +28,20 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
+<<<<<<< HEAD
     <html lang="en">
+=======
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Applies the remembered theme before the first paint, so switching
+            themes does not flash the default one on every navigation. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});if(t)document.documentElement.setAttribute(${JSON.stringify(THEME_ATTRIBUTE)},t)}catch(e){}`,
+          }}
+        />
+      </head>
+>>>>>>> origin/claude/school-result-gpa-engine-4f6lo5
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-base-200 antialiased`}
       >
@@ -53,6 +68,10 @@ export default function RootLayout({
                   {item.label}
                 </Link>
               ))}
+<<<<<<< HEAD
+=======
+              <ThemeSwitcher />
+>>>>>>> origin/claude/school-result-gpa-engine-4f6lo5
             </nav>
           </div>
         </div>
