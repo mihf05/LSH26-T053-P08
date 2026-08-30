@@ -28,9 +28,6 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-<<<<<<< HEAD
-    <html lang="en">
-=======
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* Applies the remembered theme before the first paint, so switching
@@ -41,7 +38,6 @@ export default function RootLayout({
           }}
         />
       </head>
->>>>>>> origin/claude/school-result-gpa-engine-4f6lo5
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-base-200 antialiased`}
       >
@@ -68,10 +64,7 @@ export default function RootLayout({
                   {item.label}
                 </Link>
               ))}
-<<<<<<< HEAD
-=======
               <ThemeSwitcher />
->>>>>>> origin/claude/school-result-gpa-engine-4f6lo5
             </nav>
           </div>
         </div>
