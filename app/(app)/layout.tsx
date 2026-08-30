@@ -13,12 +13,12 @@ export default function AppLayout({
         {children}
       </main>
 
-      <footer className="no-print mx-auto w-full max-w-7xl px-4 pt-4 pb-10 sm:px-8">
+      {/* <footer className="no-print mx-auto w-full max-w-7xl px-4 pt-4 pb-10 sm:px-8">
         <p className="gp-label-muted">
           Marks are stored raw in Neon Postgres. Every grade point, GPA and
           checking list is recomputed from those marks by lib/grading.ts.
         </p>
-      </footer>
+      </footer> */}
     </div>
   );
 }
