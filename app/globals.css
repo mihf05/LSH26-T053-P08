@@ -27,7 +27,7 @@
 /* switcher still works without a second set of rules.                        */
 /* ------------------------------------------------------------------------- */
 :root {
-  --gp-canvas: #f6f8fb;
+  --gp-canvas: #ffffff;
   --gp-card: #ffffff;
   --gp-ink: #000000;
   --gp-muted: #6c6c6c;
@@ -243,14 +243,15 @@
   .gp-grade {
     font-family: var(--font-mono);
     line-height: 1;
-    border: 1px solid var(--gp-rule);
-    color: var(--gp-ink);
+    border: 1px solid #000000;
+    color: #000000 !important;
+    background: transparent;
   }
 
   .gp-grade-strong {
-    background: var(--gp-ink);
-    border-color: var(--gp-ink);
-    color: var(--gp-card);
+    background: #000000 !important;
+    border-color: #000000 !important;
+    color: #ffffff !important;
   }
 
   /* A flag is a warning the office has to clear, so it takes the accent. */

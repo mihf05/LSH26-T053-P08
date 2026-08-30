@@ -1,56 +1,77 @@
 {
-  "team_id": "LSH26-T053",
-  "problem_id": "P08",
-  "repository_name": "lsh26-t053-p08",
-  "live_url": "https://gradepointweb.vercel.app",
-  "demo_video_url_optional": "",
-  "event_start_code": "LSH26-8490-C900",
-  "repository_created_before_release": false,
-  "pre_event_materials": [],
-  "sample_data": {
-    "loads_published_fixture": true,
-    "method": "file upload",
-    "reset_instructions": "Explain how judges can restore the initial data."
-  },
-  "problem_solving_method": "Briefly explain the approach and why the team chose it.",
-  "requirements": {
-    "R1": {
-      "status": "complete",
-      "evidence": "Page, route, feature or source-file path"
+    "team_id": "LSH26-T053",
+    "problem_id": "P08",
+    "repository_name": "LSH26-T053-P08",
+    "live_url": "https://gradepointweb.vercel.app",
+    "demo_video_url_optional": "",
+    "event_start_code": "LSH26-8490-C900",
+    "repository_created_before_release": false,
+    "pre_event_materials": [],
+    "sample_data": {
+        "loads_published_fixture": true,
+        "method": "database seed script",
+        "reset_instructions": "Run `npm run db:seed` or execute `db/seed.sql` to restore the 64-student initial cohort with all edge cases."
     },
-    "R2": {
-      "status": "complete",
-      "evidence": "Page, route, feature or source-file path"
+    "problem_solving_method": "Built a pure, fully deterministic grading engine (lib/grading.ts) where every calculation step attaches an explicit rule reference ID (R-10, R-11, R-12, R-13, R-29). Marks are the sole source of truth stored in PostgreSQL, and all grade points, GPAs, letter grades, and checking lists are computed on demand.",
+    "requirements": {
+        "R1": {
+            "status": "complete",
+            "evidence": "db/schema.sql, db/seed.sql, scripts/seed.mjs — 64 students across 2 classes (Science & Business Studies), 6 compulsory & 1 optional subject, theory/practical mark splits, and 10 hand-written edge cases."
+        },
+        "R2": {
+            "status": "complete",
+            "evidence": "lib/grading.ts — evaluateSubject and evaluateStudent functions compute grade points, final GPA, uncancelled GPA, and letter grades according to rule tables."
+        },
+        "R3": {
+            "status": "complete",
+            "evidence": "app/(app)/students/[id]/page.tsx — detailed per-student calculation trace showing marks used, subject grade points, bonus calculations, and rule citations for every decision."
+        },
+        "R4": {
+            "status": "complete",
+            "evidence": "app/(app)/checking-lists/page.tsx — dedicated office checking lists categorizing students with optional subject issues, practical fails, or absences."
+        }
     },
-    "R3": {
-      "status": "partial",
-      "evidence": "Explain what works and what remains"
-    },
-    "R4": {
-      "status": "not_attempted",
-      "evidence": "Not attempted"
-    }
-  },
-  "team_members": [
-    {
-      "registered_name": "<MEMBER NAME>",
-      "github_username": "<GITHUB USERNAME>",
-      "major_contribution": "Brief description of personal contribution",
-      "evidence_paths_or_commits": [
-        "src/example-file",
-        "<commit SHA if helpful>"
-      ]
-    }
-  ],
-  "major_design_decisions": ["Decision and short reason"],
-  "known_limitations": ["Known limitation or unfinished behaviour"],
-  "ai_tools_used": [
-    {
-      "tool": "<TOOL NAME>",
-      "used_for": "What the tool helped with",
-      "how_output_was_verified": "How the team checked the result"
-    }
-  ],
-  "licenses_file": "LICENSES.md",
-  "declaration": "The information above is complete and truthful to the best of the team's knowledge."
+    "team_members": [
+        {
+            "registered_name": "<MEMBER 1 NAME>",
+            "github_username": "mihf05",
+            "major_contribution": "Full-stack development of Next.js GPA Engine application, pure grading engine logic, database schema, seed scripts, rule verification suite, and UI implementation.",
+            "evidence_paths_or_commits": [
+                "lib/grading.ts",
+                "app/(app)",
+                "scripts/seed.mjs",
+                "scripts/verify.mjs"
+            ]
+        },
+        {
+            "registered_name": "Atia Farha",
+            "github_username": "Atia-Farha",
+            "major_contribution": "Frontend design, page layouts, components styling, and verification.",
+            "evidence_paths_or_commits": [
+                "components/",
+                "app/globals.css"
+            ]
+        }
+    ],
+    "major_design_decisions": [
+        "Pure computational grading engine: Marks are stored as the single source of truth; GPAs, grades, and checking lists are calculated dynamically on every request to prevent stale results.",
+        "Rule-cited evaluation trace: Every calculation step outputs rule IDs (R-10, R-11, R-12, R-13, R-29) so every grade result can be audited directly back to its underlying rule."
+    ],
+    "known_limitations": [
+        "Subject mark tables assume standard 100-mark scale breakdown (80+ A+, 70-79 A, 60-69 A-, 50-59 B, 40-49 C, 33-39 D, <33 F)."
+    ],
+    "ai_tools_used": [
+        {
+            "tool": "Claude Code",
+            "used_for": "Architectural refactoring, command proxy optimizations, and code review",
+            "how_output_was_verified": "Verified build outputs via Next.js Turbopack compiler, static analysis, and terminal command execution."
+        },
+        {
+            "tool": "Antigravity IDE",
+            "used_for": "Code generation, styling refinement, test verification script creation, and documentation",
+            "how_output_was_verified": "Executed unit verification scripts (npm run verify), static analysis, and full production build checks (npm run build)."
+        }
+    ],
+    "licenses_file": "LICENSE",
+    "declaration": "The information above is complete and truthful to the best of the team's knowledge."
 }

@@ -224,8 +224,8 @@ export default function LandingPage() {
       <footer className="flex w-full flex-col items-center gap-[20px] bg-[#fff546] p-[20px]">
         <div className="flex w-full flex-col items-start justify-between gap-[16px] text-[18px] text-[#66640f] sm:flex-row sm:items-center sm:text-[20px]">
           <div className="font-display flex flex-wrap items-center gap-[20px] leading-none font-medium tracking-[-0.02em]">
-            <Link href="/rules">Rules</Link>
             <Link href="/dashboard">Dashboard</Link>
+            <Link href="/rules">Rules</Link>
           </div>
           <p className="font-serif-display leading-[1.2] tracking-[-0.04em] whitespace-pre sm:text-right">
             {`© 2026  ·  All rights reserved`}
