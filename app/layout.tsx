@@ -5,7 +5,6 @@ import {
   Radio_Canada_Big,
   Source_Serif_4,
 } from "next/font/google";
-import { Navbar } from "@/components/Navbar";
 import { THEME_ATTRIBUTE, THEME_STORAGE_KEY } from "@/lib/themes";
 import "./globals.css";
 
@@ -52,14 +51,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col bg-base-200/50 bg-grid-pattern antialiased text-base-content`}
-      >
-        <Navbar />
-
-        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-8 sm:py-10">
-          {children}
-        </main>
+      {/* Chrome lives in the route layouts: app/(app)/layout.tsx for the result
+          screens, LandingNav for the landing page. Nothing here but the shell. */}
+      <body className="min-h-screen antialiased text-base-content">
+        {children}
       </body>
     </html>
   );

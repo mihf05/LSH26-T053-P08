@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 const NAV = [
-  { href: "/", label: "Dashboard" },
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/students", label: "Students" },
   { href: "/checking-lists", label: "Checking lists" },
   { href: "/rules", label: "Rules" },
