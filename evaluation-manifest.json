@@ -33,7 +33,7 @@
     },
     "team_members": [
         {
-            "registered_name": "<MEMBER 1 NAME>",
+            "registered_name": "Md Irfan Hasan Fahim",
             "github_username": "mihf05",
             "major_contribution": "Full-stack development of Next.js GPA Engine application, pure grading engine logic, database schema, seed scripts, rule verification suite, and UI implementation.",
             "evidence_paths_or_commits": [
