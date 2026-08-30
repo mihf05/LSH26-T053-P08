@@ -37,8 +37,6 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  // The next/font variables go on <html> so they resolve at :root, where
-  // Tailwind's @theme declares the families that reference them.
   return (
     <html
       lang="en"

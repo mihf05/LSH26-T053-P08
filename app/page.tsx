@@ -11,7 +11,7 @@ import { getResultSet } from "@/lib/queries";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "School Result Processing System | Dashboard",
+  title: "GradePoint — School Result Processing and GPA Engine",
   description:
     "Grade points, GPAs, per student calculation traces and the office checking lists, computed from raw marks and traceable to a rule.",
 };
@@ -20,6 +20,7 @@ export default async function DashboardPage() {
   const { classes, results } = await getResultSet();
 
   const passed = results.filter((r) => r.passed);
+  const failed = results.filter((r) => !r.passed);
 
   const gpaOfPassing = passed.map((r) => r.gpa);
   const averageGpa =
