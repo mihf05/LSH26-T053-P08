@@ -8,7 +8,6 @@ const NAV = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/students", label: "Students" },
   { href: "/checking-lists", label: "Checking lists" },
-  { href: "/rules", label: "Rules" },
 ];
 
 /** The result screens' nav. Deliberately the same wordmark and link treatment

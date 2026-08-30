@@ -53,14 +53,9 @@ export default async function DashboardPage() {
         eyebrow={`${classes.length} classes · results recomputed on load`}
         title="Results are ready to review"
         actions={
-          <>
-            <Link href="/checking-lists" className="gp-btn gp-btn-primary">
-              Open checking lists
-            </Link>
-            <Link href="/rules" className="gp-btn">
-              Rules
-            </Link>
-          </>
+          <Link href="/checking-lists" className="gp-btn gp-btn-primary">
+            Open checking lists
+          </Link>
         }
       >
         {flagged.length} of {results.length} students need a teacher to verify

@@ -105,8 +105,8 @@ export default function LandingPage() {
               </p>
             </div>
             <div className="flex flex-col items-center gap-[16px] sm:flex-row">
-              <ButtonPrimary href="/dashboard" label="Open the dashboard" />
-              <ButtonPrimary href="/students" label="Explore the engine" />
+              <ButtonPrimary href="/rules" label="View rules" />
+              <ButtonPrimary href="/dashboard" label="Open dashboard" />
             </div>
           </div>
           <div className="relative aspect-[960/608] w-full max-w-[960px] rounded-[24px] border-2 border-solid border-black">
@@ -154,8 +154,8 @@ export default function LandingPage() {
                 ))}
               </ul>
               <ButtonPrimary
-                href="/students/1"
-                label="Open a student trace"
+                href="/dashboard"
+                label="Open the dashboard"
                 className="w-full sm:w-auto"
               />
             </div>
@@ -231,8 +231,8 @@ export default function LandingPage() {
               </p>
             </div>
             <ButtonSecondary
-              href="/checking-lists"
-              label="Open the checking lists"
+              href="/dashboard"
+              label="Open the dashboard"
               className="w-full sm:w-auto"
             />
           </div>
@@ -354,11 +354,8 @@ export default function LandingPage() {
       <footer className="flex w-full flex-col items-center gap-[20px] bg-[#fff546] p-[20px]">
         <div className="flex w-full flex-col items-start justify-between gap-[16px] text-[18px] text-[#66640f] sm:flex-row sm:items-center sm:text-[20px]">
           <div className="font-display flex flex-wrap items-center gap-[20px] leading-none font-medium tracking-[-0.02em]">
-            <Link href="/dashboard">Dashboard</Link>
-            <Link href="/students">Students</Link>
-            <Link href="/checking-lists">Checking lists</Link>
             <Link href="/rules">Rules</Link>
-            <Link href="/dashboard">Get started</Link>
+            <Link href="/dashboard">Dashboard</Link>
           </div>
           <p className="font-serif-display leading-[1.2] tracking-[-0.04em] whitespace-pre sm:text-right">
             {`© 2026  ·  All rights reserved`}

@@ -2,12 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { asset } from "@/lib/landing-assets";
 
 const NAV_LINKS = [
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/students", label: "Students" },
-  { href: "/checking-lists", label: "Checking lists" },
   { href: "/rules", label: "Rules" },
 ];
 
@@ -38,23 +35,6 @@ export function LandingNav() {
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/dashboard"
-            className="flex items-center justify-center gap-[4px] hover:opacity-70"
-          >
-            <span className="font-display text-[16px] leading-[1.2] font-medium whitespace-nowrap text-black">
-              Get started
-            </span>
-            <span className="flex w-[14px] items-center justify-center">
-              <img
-                src={asset("arrow.svg")}
-                alt=""
-                width={11}
-                height={9}
-                className="block h-[9px] w-[11.225px] -rotate-90"
-              />
-            </span>
-          </Link>
         </div>
 
         <button
