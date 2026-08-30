@@ -51,14 +51,14 @@ export function ThemeSwitcher() {
     <button
       type="button"
       onClick={toggleTheme}
-      aria-label={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-      title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-      className="relative flex items-center justify-center size-9 rounded-md border border-base-300 bg-base-100 hover:bg-base-200 text-base-content transition-all duration-300 shadow-xs focus:outline-hidden"
+      aria-label={isDark ? "Switch to the light theme" : "Switch to the dark theme"}
+      title={isDark ? "Switch to the light theme" : "Switch to the dark theme"}
+      className="gp-btn size-9 shrink-0 p-0"
     >
       {isDark ? (
         // Sun Icon for Light Mode Switch
         <svg
-          className="size-4.5 text-amber-400 transition-transform duration-300 rotate-0 hover:rotate-45"
+          className="size-4"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -74,7 +74,7 @@ export function ThemeSwitcher() {
       ) : (
         // Moon Icon for Dark Mode Switch
         <svg
-          className="size-4.5 text-slate-700 dark:text-slate-200 transition-transform duration-300 -rotate-12 hover:rotate-0"
+          className="size-4"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"

@@ -1,9 +1,10 @@
 @import "tailwindcss";
-/* Black (Dark) theme default, with Light theme toggle option. */
+/* Light is the default: the result screens use the same black-on-white palette
+   as the landing page. The black theme inverts it -- see the token block. */
 @plugin "daisyui" {
   themes:
-    black --default,
-    light;
+    light --default,
+    black;
 }
 
 @theme {
@@ -17,98 +18,304 @@
     var(--font-radio-canada-big), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* Glassmorphism & Card Styles */
-.glass-card {
-  background: var(--color-base-100);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--color-base-300);
-  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.05);
+/* ------------------------------------------------------------------------- */
+/* Design tokens                                                             */
+/*                                                                           */
+/* Taken from the product UI in the landing page's hero: a blue-grey canvas,  */
+/* white cards, pure black ink, one yellow accent and one blue for deltas.    */
+/* The black theme flips canvas and ink and keeps both accents, so the        */
+/* switcher still works without a second set of rules.                        */
+/* ------------------------------------------------------------------------- */
+:root {
+  --gp-canvas: #f6f8fb;
+  --gp-card: #ffffff;
+  --gp-ink: #000000;
+  --gp-muted: #6c6c6c;
+  --gp-rule: #dbe0ec;
+  --gp-accent: #fff546;
+  --gp-on-accent: #000000;
+  --gp-data: #1f6feb;
 }
 
-/* Ambient Subtle Background Grid Pattern */
-.bg-grid-pattern {
-  background-image: radial-gradient(rgba(120, 119, 198, 0.12) 1px, transparent 1px);
-  background-size: 24px 24px;
+[data-theme="black"] {
+  --gp-canvas: #000000;
+  --gp-card: #0d0d0d;
+  --gp-ink: #ffffff;
+  --gp-muted: #8f8f8f;
+  --gp-rule: #262626;
+  --gp-accent: #fff546;
+  --gp-on-accent: #000000;
+  --gp-data: #74a9ff;
 }
 
-/* Glowing Status Indicator Animations */
-@keyframes pulse-glow {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
+/* These live in the components layer so Tailwind utilities, which come
+   after it, can still override any single property at a call site --
+   `gp-btn p-0` and `gp-pill px-2` have to win. */
+@layer components {
+  .gp-canvas {
+    background: var(--gp-canvas);
+    color: var(--gp-ink);
   }
-  50% {
-    opacity: 0.4;
-    transform: scale(1.15);
+
+  /* Cards carry no border in the reference -- they separate from the canvas by
+     value alone. The hairline only appears on the black theme, where white-on-
+     near-black has too little contrast to read as an edge. */
+  .gp-card {
+    background: var(--gp-card);
+    border-radius: 16px;
   }
-}
+  [data-theme="black"] .gp-card {
+    border: 1px solid var(--gp-rule);
+  }
 
-.status-dot-pulse {
-  animation: pulse-glow 2.5s infinite ease-in-out;
-}
+  /* A label names a measure; it is always mono, always ink, never shouted. */
+  .gp-label {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.2;
+    color: var(--gp-ink);
+  }
 
-.card-hover {
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
-}
-.card-hover:hover {
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.07);
-}
+  .gp-label-muted {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.2;
+    color: var(--gp-muted);
+  }
 
-/* Gradient Text & Highlights */
-.gradient-text {
-  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+  /* The number is the loudest thing on the card, set in the display face. */
+  .gp-metric {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 2.75rem;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--gp-ink);
+    font-variant-numeric: tabular-nums;
+  }
 
-.gradient-bg-primary {
-  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
-}
+  .gp-metric-sm {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.75rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--gp-ink);
+    font-variant-numeric: tabular-nums;
+  }
 
-.gradient-bg-accent {
-  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
-}
+  /* The unit rides on the baseline of the number, small and mono. */
+  .gp-unit {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--gp-muted);
+  }
 
-/* Top Accent Line for Modern Stat Cards */
-.top-gradient-border {
-  position: relative;
-  overflow: hidden;
-}
-.top-gradient-border::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #3b82f6, #6366f1, #8b5cf6);
-}
+  .gp-delta {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--gp-data);
+    font-variant-numeric: tabular-nums;
+  }
 
-/* The rule column of a trace is prose, not data -- keep it crisp and readable. */
-.rule-text {
-  font-size: 0.78rem;
-  line-height: 1.15rem;
-  opacity: 0.95;
-}
+  /* The yellow pill is the accent, used once or twice per screen at most. */
+  .gp-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 999px;
+    background: var(--gp-accent);
+    color: var(--gp-on-accent);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1;
+    padding: 0.375rem 0.625rem;
+    white-space: nowrap;
+  }
 
-/* Mark sheet tables are dense; tighten cell padding & add clean high-contrast borders. */
-.table-tight :where(th, td) {
-  padding-top: 0.65rem;
-  padding-bottom: 0.65rem;
-}
+  .gp-pill-quiet {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 999px;
+    border: 1px solid var(--gp-rule);
+    color: var(--gp-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1;
+    padding: 0.375rem 0.625rem;
+    white-space: nowrap;
+  }
 
-.table-modern {
-  border-collapse: separate;
-  border-spacing: 0;
-}
+  /* Page headings: display face, tight, with a serif line underneath. */
+  .gp-h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--gp-ink);
+  }
 
-.table-modern th {
-  font-weight: 600;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  opacity: 0.9;
-  border-bottom: 2px solid var(--color-base-300);
+  .gp-h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.25rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--gp-ink);
+  }
+
+  .gp-sub {
+    font-family: var(--font-serif-display);
+    font-size: 1.25rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--gp-muted);
+  }
+
+  .gp-body {
+    font-family: var(--font-serif-display);
+    font-size: 1rem;
+    line-height: 1.35;
+    color: var(--gp-muted);
+  }
+
+  .gp-rule-line {
+    border-color: var(--gp-rule);
+  }
+
+  /* Bars are hairline-thin and ink-black -- the chart reads as a set of marks,
+     not a set of filled shapes. */
+  .gp-bar {
+    background: var(--gp-ink);
+  }
+
+  .gp-bar-accent {
+    background: var(--gp-accent);
+  }
+
+  .gp-gridline {
+    background: var(--gp-rule);
+  }
+
+  /* The rule column of a trace is prose, not data -- keep it readable but quiet. */
+  .rule-text {
+    font-family: var(--font-serif-display);
+    font-size: 0.875rem;
+    line-height: 1.3;
+    color: var(--gp-muted);
+  }
+
+  /* Mark sheet tables are dense; tighten the default daisyUI cell padding. */
+  .table-tight :where(th, td) {
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+  }
+
+  /* Table headers are labels, so they follow the label rule: mono, muted, small. */
+  .gp-table th {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gp-muted);
+    border-bottom: 1px solid var(--gp-rule);
+  }
+
+  .gp-table td {
+    border-bottom: 1px solid var(--gp-rule);
+    color: var(--gp-ink);
+  }
+
+  .gp-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .gp-num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+
+  /* A grade reads as a mono glyph in a hairline box; the failing ones get ink. */
+  .gp-grade {
+    font-family: var(--font-mono);
+    line-height: 1;
+    border: 1px solid var(--gp-rule);
+    color: var(--gp-ink);
+  }
+
+  .gp-grade-strong {
+    background: var(--gp-ink);
+    border-color: var(--gp-ink);
+    color: var(--gp-card);
+  }
+
+  /* A flag is a warning the office has to clear, so it takes the accent. */
+  .gp-flag {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    background: var(--gp-accent);
+    color: var(--gp-on-accent);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    line-height: 1;
+    padding: 0.25rem 0.5rem;
+    white-space: nowrap;
+  }
+
+  /* Buttons: ink for the primary action, hairline for everything else. */
+  .gp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--gp-rule);
+    background: transparent;
+    color: var(--gp-ink);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1;
+    padding: 0.625rem 1rem;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+  .gp-btn:hover {
+    border-color: var(--gp-ink);
+  }
+
+  .gp-btn-primary {
+    background: var(--gp-ink);
+    border-color: var(--gp-ink);
+    color: var(--gp-card);
+  }
+  .gp-btn-primary:hover {
+    opacity: 0.85;
+  }
+
+  /* Inputs follow the buttons: hairline, mono, no fill. */
+  .gp-input,
+  .gp-select {
+    border-radius: 999px;
+    border: 1px solid var(--gp-rule);
+    background: var(--gp-card);
+    color: var(--gp-ink);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    padding: 0.625rem 1rem;
+    width: 100%;
+  }
+  .gp-input:focus-visible,
+  .gp-select:focus-visible {
+    outline: 2px solid var(--gp-ink);
+    outline-offset: 1px;
+  }
+  .gp-input::placeholder {
+    color: var(--gp-muted);
+  }
 }
 
 @media print {
@@ -116,4 +323,3 @@
     display: none !important;
   }
 }
-

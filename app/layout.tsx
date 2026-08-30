@@ -53,7 +53,7 @@ export default function RootLayout({
       </head>
       {/* Chrome lives in the route layouts: app/(app)/layout.tsx for the result
           screens, LandingNav for the landing page. Nothing here but the shell. */}
-      <body className="min-h-screen antialiased text-base-content">
+      <body className="gp-canvas min-h-screen antialiased">
         {children}
       </body>
     </html>

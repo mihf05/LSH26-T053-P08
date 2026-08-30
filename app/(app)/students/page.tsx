@@ -1,10 +1,11 @@
+import { PageHeader } from "@/components/PageHeader";
 import { StudentsTable, type StudentRowView } from "@/components/StudentsTable";
 import { formatGpa } from "@/lib/grading";
 import { getResultSet } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Students | Result Processing" };
+export const metadata = { title: "Students | GradePoint" };
 
 export default async function StudentsPage() {
   const { classes, results } = await getResultSet();
@@ -28,24 +29,13 @@ export default async function StudentsPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="rounded-lg border border-base-300 bg-base-100 p-8 shadow-xs">
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-              Student Directory
-            </span>
-            <span className="text-xs text-base-content/60 font-medium">
-              {results.length} Enrolled
-            </span>
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">
-            Student Performance Registry
-          </h1>
-          <p className="max-w-3xl text-sm opacity-75 leading-relaxed">
-            Detailed transcript index showing calculated GPA, letter grades, and subject failure flags. Click any student record to view the step-by-step rule execution trace.
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        eyebrow={`${results.length} students · ${classes.length} classes`}
+        title="Every student, every grade"
+      >
+        Open a row for the step by step trace: the mark used, the grade point it
+        earned, and the rule that decided it.
+      </PageHeader>
       <StudentsTable rows={rows} classes={classes} />
     </div>
   );

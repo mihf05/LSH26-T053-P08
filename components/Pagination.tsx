@@ -40,21 +40,19 @@ export function Pagination({
   };
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between py-3 px-1 no-print">
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-base-content/75">
-        <span>
-          Showing <strong className="text-base-content">{startItem}</strong> to{" "}
-          <strong className="text-base-content">{endItem}</strong> of{" "}
-          <strong className="text-base-content">{totalItems}</strong> entries
+    <div className="no-print flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-wrap items-center gap-4">
+        <span className="gp-label-muted">
+          {startItem}-{endItem} of {totalItems}
         </span>
 
         {onPageSizeChange && (
-          <div className="flex items-center gap-1.5">
-            <span className="opacity-75">Rows:</span>
+          <div className="flex items-center gap-2">
+            <span className="gp-label-muted">Rows</span>
             <select
               value={pageSize}
               onChange={(e) => onPageSizeChange(Number(e.target.value))}
-              className="select select-xs select-bordered rounded-md text-xs font-mono"
+              className="gp-select w-auto px-3 py-1.5"
             >
               <option value={5}>5</option>
               <option value={10}>10</option>
@@ -70,10 +68,10 @@ export function Pagination({
           type="button"
           disabled={currentPage === 1}
           onClick={() => onPageChange(currentPage - 1)}
-          className="btn btn-xs rounded-md border border-base-300 bg-base-100 disabled:opacity-40"
-          aria-label="Previous Page"
+          className="gp-btn px-3 py-1.5 disabled:opacity-30"
+          aria-label="Previous page"
         >
-          &larr; Prev
+          Prev
         </button>
 
         <div className="flex items-center gap-1">
@@ -83,16 +81,14 @@ export function Pagination({
                 key={idx}
                 type="button"
                 onClick={() => onPageChange(p)}
-                className={`btn btn-xs rounded-md min-w-[1.75rem] font-mono ${
-                  currentPage === p
-                    ? "btn-primary shadow-xs"
-                    : "btn-ghost border border-base-200"
+                className={`gp-btn min-w-[2rem] px-2.5 py-1.5 ${
+                  currentPage === p ? "gp-btn-primary" : ""
                 }`}
               >
                 {p}
               </button>
             ) : (
-              <span key={idx} className="px-1 text-xs opacity-50 font-mono">
+              <span key={idx} className="gp-label-muted px-1">
                 {p}
               </span>
             )
@@ -103,10 +99,10 @@ export function Pagination({
           type="button"
           disabled={currentPage >= totalPages}
           onClick={() => onPageChange(currentPage + 1)}
-          className="btn btn-xs rounded-md border border-base-300 bg-base-100 disabled:opacity-40"
-          aria-label="Next Page"
+          className="gp-btn px-3 py-1.5 disabled:opacity-30"
+          aria-label="Next page"
         >
-          Next &rarr;
+          Next
         </button>
       </div>
     </div>

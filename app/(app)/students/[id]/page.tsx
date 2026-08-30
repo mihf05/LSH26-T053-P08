@@ -1,75 +1,71 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { GradeBadge } from "@/components/GradeBadge";
+import { SectionHeader } from "@/components/PageHeader";
 import { formatGpa, type SubjectResult } from "@/lib/grading";
 import { getResultSet, getStudentResult } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
-const STATUS_ROW: Record<string, string> = {
-  absent: "bg-base-200/50",
-  theory_fail: "bg-rose-500/10 dark:bg-rose-950/20",
-  practical_fail: "bg-rose-500/10 dark:bg-rose-950/20",
-  total_fail: "bg-rose-500/10 dark:bg-rose-950/20",
-  pass: "",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const result = await getStudentResult(Number(id));
+  return { title: result ? `${result.student.name} | GradePoint` : "GradePoint" };
+}
 
 function SubjectRow({ r }: { r: SubjectResult }) {
+  const failed = r.status !== "pass";
+
   return (
-    <tr className={`transition-colors hover:bg-base-200/40 ${STATUS_ROW[r.status]}`}>
-      <td className="whitespace-nowrap py-3">
-        <div className="font-bold text-base-content">{r.subject.name}</div>
-        <div className="flex items-center gap-1 text-[0.7rem] opacity-60">
-          <span className="font-mono">{r.subject.code}</span>
+    <tr>
+      <td className="px-0 py-3 whitespace-nowrap">
+        <div className="flex items-center gap-2">
+          <span>{r.subject.name}</span>
           {r.subject.isOptional && (
-            <span className="rounded bg-primary/10 px-1 font-semibold text-primary">
-              Optional 4th
-            </span>
+            <span className="gp-pill-quiet">optional</span>
           )}
-          <span>
-            &middot;{" "}
-            {r.subject.hasPractical
-              ? `${r.subject.theoryFull}+${r.subject.practicalFull} marks`
-              : `${r.subject.theoryFull} marks`}
-          </span>
         </div>
-      </td>
-      <td className="font-mono text-sm font-semibold">
-        {r.isAbsent ? (
-          <span className="rounded bg-slate-500/20 px-2 py-0.5 text-xs text-slate-700 dark:text-slate-300 font-semibold">
-            AB
-          </span>
-        ) : (
-          r.displayMark
-        )}
-      </td>
-      <td className="text-right font-mono text-xs opacity-80">
-        {r.isAbsent ? "-" : `${r.theoryMark}/${r.subject.theoryFull}`}
-        <span className="block text-[0.65rem] opacity-55">
-          pass &ge;{r.subject.theoryPass}
+        <span className="gp-label-muted block">
+          {r.subject.code} ·{" "}
+          {r.subject.hasPractical
+            ? `${r.subject.theoryFull}+${r.subject.practicalFull}`
+            : `${r.subject.theoryFull}`}{" "}
+          marks
         </span>
       </td>
-      <td className="text-right font-mono text-xs opacity-80">
+      <td className="gp-num px-3 py-3">{r.isAbsent ? "AB" : r.displayMark}</td>
+      <td className="gp-num px-3 py-3 text-right text-xs">
+        {r.isAbsent ? "—" : `${r.theoryMark}/${r.subject.theoryFull}`}
+        <span className="gp-label-muted block">≥{r.subject.theoryPass}</span>
+      </td>
+      <td className="gp-num px-3 py-3 text-right text-xs">
         {!r.subject.hasPractical ? (
-          <span className="opacity-40">n/a</span>
+          <span className="gp-label-muted">n/a</span>
         ) : r.isAbsent ? (
-          "-"
+          "—"
         ) : (
           <>
             {r.practicalMark}/{r.subject.practicalFull}
-            <span className="block text-[0.65rem] opacity-55">
-              pass &ge;{r.subject.practicalPass}
+            <span className="gp-label-muted block">
+              ≥{r.subject.practicalPass}
             </span>
           </>
         )}
       </td>
-      <td className="text-right font-mono font-bold text-sm">
+      <td className="gp-num px-3 py-3 text-right">
         {r.gradePoint.toFixed(2)}
       </td>
-      <td>
+      <td className="px-3 py-3">
         <GradeBadge letter={r.isAbsent ? "AB" : r.letter} size="sm" />
       </td>
-      <td className="rule-text max-w-md text-xs leading-relaxed opacity-85">{r.rule}</td>
+      <td className="rule-text max-w-md px-3 py-3">
+        {failed && <span className="gp-flag mr-2 align-middle">fail</span>}
+        {r.rule}
+      </td>
     </tr>
   );
 }
@@ -94,346 +90,255 @@ export default async function StudentTracePage({
   const rawGpa = (result.compulsorySum + result.optionalBonus) / 6;
   const wasCapped = rawGpa > 5;
 
+  const subjects = [
+    ...result.compulsory,
+    ...(result.optional ? [result.optional] : []),
+  ];
+
+  /** The computation, in the order the engine runs it. The numbering is the
+   *  sequence itself, not decoration -- each step feeds the next. */
+  const steps = [
+    {
+      label: "Add the compulsory grade points",
+      value: `${result.compulsory.map((r) => r.gradePoint.toFixed(2)).join(" + ")} = ${result.compulsorySum.toFixed(2)}`,
+    },
+    {
+      label: "Take whatever the optional subject earned above 2.00",
+      value: `max(0, ${result.optionalGradePoint.toFixed(2)} − 2.00) = ${result.optionalBonus.toFixed(2)}`,
+    },
+    {
+      label: "Divide by six",
+      value: `(${result.compulsorySum.toFixed(2)} + ${result.optionalBonus.toFixed(2)}) / 6 = ${formatGpa(rawGpa)}${wasCapped ? "  → capped at 5.00" : ""}`,
+    },
+    {
+      label: "Before any cancellation",
+      value:
+        result.averageMark !== null
+          ? `${formatGpa(result.uncancelledGpa)}  ·  mean mark ${result.averageMark.toFixed(2)}/100`
+          : formatGpa(result.uncancelledGpa),
+    },
+    {
+      label: result.passed ? "Nothing cancels it" : "A compulsory fail cancels it",
+      value: result.passed
+        ? `GPA ${formatGpa(result.gpa)}, grade ${result.letter}`
+        : `GPA 0.00, grade F (R-13)`,
+    },
+  ];
+
+  const listFlags = [
+    result.flags.optionalDidNotHelp && "Optional list",
+    result.flags.practicalFail && "Practical fail list",
+    result.flags.absent && "Absentee list",
+  ].filter(Boolean) as string[];
+
   return (
-    <div className="flex flex-col gap-8">
-      {/* Navigation sub-header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs no-print">
-        <Link
-          href="/students"
-          className="btn btn-ghost btn-xs rounded-md gap-1 text-base-content/75 hover:text-base-content transition-colors duration-200"
-        >
-          &larr; Back to Student Registry
+    <div className="flex flex-col gap-10">
+      <div className="no-print flex flex-wrap items-center justify-between gap-3">
+        <Link href="/students" className="gp-label underline-offset-4 hover:underline">
+          ← All students
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {prev && (
-            <Link
-              href={`/students/${prev.student.id}`}
-              className="btn btn-ghost btn-xs rounded-md opacity-75 hover:opacity-100 transition-opacity duration-200"
-            >
-              &larr; Roll #{prev.student.roll} ({prev.student.name})
+            <Link href={`/students/${prev.student.id}`} className="gp-btn">
+              ← #{prev.student.roll}
             </Link>
           )}
           {next && (
-            <Link
-              href={`/students/${next.student.id}`}
-              className="btn btn-ghost btn-xs rounded-md opacity-75 hover:opacity-100 transition-opacity duration-200"
-            >
-              Roll #{next.student.roll} ({next.student.name}) &rarr;
+            <Link href={`/students/${next.student.id}`} className="gp-btn">
+              #{next.student.roll} →
             </Link>
           )}
         </div>
       </div>
 
-      {/* Student Profile Banner */}
-      <div className="relative overflow-hidden rounded-lg border border-base-300 bg-base-100 p-8 shadow-xs">
-        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
-              <span className="rounded-md bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                {result.student.className}
+      <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+        <div className="flex flex-col gap-2">
+          <span className="gp-label-muted">
+            #{result.student.roll} · {result.student.className}
+          </span>
+          <h1 className="gp-h1">{result.student.name}</h1>
+          {result.student.edgeCaseNote && (
+            <p className="gp-sub max-w-2xl">{result.student.edgeCaseNote}</p>
+          )}
+        </div>
+
+        <div className="gp-card flex items-end gap-6 self-start p-5 md:self-auto">
+          <div className="flex flex-col gap-2">
+            <span className="gp-label">Final GPA</span>
+            <span className="flex items-baseline gap-1.5">
+              <span className="gp-metric">{formatGpa(result.gpa)}</span>
+              <span className="gp-unit">/ 5.00</span>
+            </span>
+            {!result.passed && (
+              <span className="gp-label-muted">
+                was {formatGpa(result.uncancelledGpa)} before cancellation
               </span>
-              <span className="font-mono text-xs font-medium opacity-80 text-base-content/80">
-                Roll #{result.student.roll}
-              </span>
-            </div>
-            <h1 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">
-              {result.student.name}
-            </h1>
-            {result.student.edgeCaseNote && (
-              <div className="mt-1 flex items-start gap-3 max-w-2xl text-xs rounded-md bg-amber-500/10 border border-amber-500/20 p-4 text-amber-900 dark:text-amber-200 font-medium">
-                <span className="font-bold shrink-0 uppercase tracking-wider text-[0.65rem] rounded-md bg-amber-500/20 px-2 py-0.5">
-                  Edge Case Boundary
-                </span>
-                <span>{result.student.edgeCaseNote}</span>
-              </div>
             )}
           </div>
-
-          <div className="flex items-center gap-6 rounded-md bg-base-200/50 p-5 border border-base-200 self-start md:self-auto">
-            <div className="flex flex-col text-right">
-              <span className="text-[0.7rem] font-bold tracking-wider uppercase opacity-80 text-base-content/80">
-                Final GPA Output
-              </span>
-              <span
-                className={`font-mono text-4xl font-bold ${
-                  result.passed
-                    ? "text-emerald-600 dark:text-emerald-400"
-                    : "text-rose-600 dark:text-rose-400"
-                }`}
-              >
-                {formatGpa(result.gpa)}
-              </span>
-              {!result.passed && (
-                <span className="text-[0.7rem] opacity-80 font-mono mt-1 text-base-content/80">
-                  Uncancelled: {formatGpa(result.uncancelledGpa)}
-                </span>
-              )}
-            </div>
-            <GradeBadge letter={result.letter} size="lg" />
-          </div>
+          <GradeBadge letter={result.letter} size="lg" />
         </div>
-      </div>
+      </header>
 
-      {/* Failure Warning Card */}
       {!result.passed && (
-        <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-6 text-rose-900 dark:text-rose-200 shadow-xs">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
-              <span className="rounded-md bg-rose-500/20 px-2.5 py-1 text-xs font-bold uppercase tracking-wider">
-                Result Cancelled (R-13)
-              </span>
-              <span className="text-xs font-semibold">
-                Failed on {result.failedCompulsory.length} compulsory subject
-                {result.failedCompulsory.length > 1 ? "s" : ""}
-              </span>
-            </div>
-            <p className="text-xs leading-relaxed opacity-90">
-              The student achieved an uncancelled average of{" "}
-              <strong>
-                {result.averageMark !== null
-                  ? `${result.averageMark.toFixed(2)} / 100`
-                  : "n/a"}
-              </strong>{" "}
-              and raw GPA of <strong>{formatGpa(result.uncancelledGpa)}</strong>. However, due to failure in compulsory coursework, Rule R-13 sets the final GPA to <strong>0.00</strong> and final letter grade to <strong>F</strong>.
-            </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {result.failedCompulsory.map((r) => (
-                <div
-                  key={r.subject.id}
-                  className="rounded-md bg-base-100 px-3 py-1.5 text-xs font-semibold border border-rose-500/30 text-rose-700 dark:text-rose-300"
-                >
-                  {r.subject.name}: {r.rule}
-                </div>
-              ))}
-            </div>
+        <section className="gp-card flex flex-col gap-3 p-5 sm:p-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="gp-pill">Result cancelled</span>
+            <span className="gp-label">R-13</span>
           </div>
-        </div>
+          <p className="gp-body max-w-3xl">
+            {result.student.name} averaged{" "}
+            {result.averageMark !== null
+              ? `${result.averageMark.toFixed(2)} out of 100`
+              : "n/a"}{" "}
+            for an uncancelled GPA of {formatGpa(result.uncancelledGpa)}. Failing{" "}
+            {result.failedCompulsory.length} compulsory subject
+            {result.failedCompulsory.length > 1 ? "s" : ""} sets the printed
+            result to 0.00 and F regardless.
+          </p>
+          <ul className="flex flex-wrap gap-2">
+            {result.failedCompulsory.map((r) => (
+              <li key={r.subject.id} className="gp-pill-quiet">
+                {r.subject.name}
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
-      {/* Subject Trace Section */}
-      <section className="rounded-lg border border-base-300 bg-base-100 p-6 sm:p-8 shadow-xs">
-        <div className="flex flex-col gap-1 border-b border-base-200 pb-5 mb-6">
-          <h2 className="text-xl font-bold text-base-content">
-            Subject Mark & Rule Trace
-          </h2>
-          <p className="text-xs text-base-content/60">
-            Raw evaluation breakdown, component pass checks, and applied rule logic for each subject
-          </p>
-        </div>
+      <section className="flex flex-col gap-5">
+        <SectionHeader title="Subject by subject" meta={`${subjects.length} subjects`}>
+          The mark the engine used, the grade point it earned, and the rule that
+          decided it.
+        </SectionHeader>
 
-        {/* Mobile Subject Cards (< md) */}
-        <div className="flex flex-col gap-4 md:hidden">
-          {[...result.compulsory, ...(result.optional ? [result.optional] : [])].map((r) => (
-            <div
-              key={r.subject.id}
-              className={`rounded-md border p-4 flex flex-col gap-2.5 ${
-                r.status === "pass"
-                  ? "bg-base-200/30 border-base-200"
-                  : "bg-rose-500/10 border-rose-500/30"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-sm text-base-content">{r.subject.name}</h4>
-                  <div className="flex items-center gap-1.5 text-[0.7rem] opacity-65 font-mono">
-                    <span>{r.subject.code}</span>
-                    {r.subject.isOptional && (
-                      <span className="rounded bg-primary/10 px-1 font-semibold text-primary">
-                        Optional 4th
-                      </span>
-                    )}
-                  </div>
+        <div className="flex flex-col gap-3 md:hidden">
+          {subjects.map((r) => (
+            <div key={r.subject.id} className="gp-card flex flex-col gap-4 p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col gap-1">
+                  <span className="gp-label">{r.subject.name}</span>
+                  <span className="gp-label-muted">
+                    {r.subject.code}
+                    {r.subject.isOptional && " · optional"}
+                  </span>
                 </div>
-                <GradeBadge letter={r.isAbsent ? "AB" : r.letter} size="sm" />
+                <GradeBadge letter={r.isAbsent ? "AB" : r.letter} size="md" />
               </div>
 
-              <div className="grid grid-cols-3 gap-2 py-2 border-y border-base-200/60 text-xs font-mono">
-                <div>
-                  <span className="block text-[0.65rem] opacity-60 uppercase">Mark</span>
-                  <span className="font-bold">{r.isAbsent ? "AB" : r.displayMark}</span>
+              <div
+                className="grid grid-cols-3 gap-3 border-y py-3"
+                style={{ borderColor: "var(--gp-rule)" }}
+              >
+                <div className="flex flex-col gap-1">
+                  <span className="gp-label-muted">Mark</span>
+                  <span className="gp-num text-sm">
+                    {r.isAbsent ? "AB" : r.displayMark}
+                  </span>
                 </div>
-                <div>
-                  <span className="block text-[0.65rem] opacity-60 uppercase">Theory</span>
-                  <span>{r.isAbsent ? "-" : `${r.theoryMark}/${r.subject.theoryFull}`}</span>
+                <div className="flex flex-col gap-1">
+                  <span className="gp-label-muted">Theory</span>
+                  <span className="gp-num text-sm">
+                    {r.isAbsent ? "—" : `${r.theoryMark}/${r.subject.theoryFull}`}
+                  </span>
                 </div>
-                <div>
-                  <span className="block text-[0.65rem] opacity-60 uppercase">Practical</span>
-                  <span>
-                    {!r.subject.hasPractical ? "n/a" : r.isAbsent ? "-" : `${r.practicalMark}/${r.subject.practicalFull}`}
+                <div className="flex flex-col gap-1">
+                  <span className="gp-label-muted">Practical</span>
+                  <span className="gp-num text-sm">
+                    {!r.subject.hasPractical
+                      ? "n/a"
+                      : r.isAbsent
+                        ? "—"
+                        : `${r.practicalMark}/${r.subject.practicalFull}`}
                   </span>
                 </div>
               </div>
 
-              <div className="text-xs text-base-content/85 leading-relaxed rule-text">
-                <span className="font-semibold text-primary">Rule Trace:</span> {r.rule}
-              </div>
+              <p className="rule-text">{r.rule}</p>
             </div>
           ))}
         </div>
 
-        {/* Desktop Table View (>= md) */}
-        <div className="hidden md:block overflow-hidden rounded-md border border-base-200">
-          <div className="overflow-x-auto">
-            <table className="table table-sm table-tight table-modern w-full">
-              <thead>
-                <tr className="bg-base-200/50">
-                  <th className="font-semibold py-3 px-4">Subject</th>
-                  <th className="font-semibold py-3 px-4">Mark Used</th>
-                  <th className="text-right font-semibold py-3 px-4">Theory</th>
-                  <th className="text-right font-semibold py-3 px-4">Practical</th>
-                  <th className="text-right font-semibold py-3 px-4">Grade Point</th>
-                  <th className="font-semibold py-3 px-4">Letter</th>
-                  <th className="font-semibold py-3 px-4">Applied Rule</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-base-200">
-                {result.compulsory.map((r) => (
-                  <SubjectRow key={r.subject.id} r={r} />
-                ))}
-              </tbody>
-              {result.optional && (
-                <tbody className="border-t-2 border-primary/30">
-                  <SubjectRow r={result.optional} />
-                </tbody>
-              )}
-            </table>
-          </div>
+        <div className="gp-card hidden overflow-x-auto p-5 sm:p-6 md:block">
+          <table className="gp-table table-tight w-full text-left text-sm">
+            <thead>
+              <tr>
+                <th className="px-0 py-2">Subject</th>
+                <th className="px-3 py-2">Mark used</th>
+                <th className="px-3 py-2 text-right">Theory</th>
+                <th className="px-3 py-2 text-right">Practical</th>
+                <th className="px-3 py-2 text-right">Grade point</th>
+                <th className="px-3 py-2">Letter</th>
+                <th className="px-3 py-2">Rule</th>
+              </tr>
+            </thead>
+            <tbody>
+              {subjects.map((r) => (
+                <SubjectRow key={r.subject.id} r={r} />
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
 
-      {/* Calculation & Manual Check Dual Cards */}
       <div className="grid gap-8 lg:grid-cols-2">
-        {/* GPA Calculation Card */}
-        <section className="rounded-lg border border-base-300 bg-base-100 p-8 shadow-xs">
-          <div className="border-b border-base-200 pb-5 mb-6">
-            <h2 className="text-xl font-bold text-base-content">
-              GPA Calculation Pipeline (R-13)
-            </h2>
-            <p className="text-xs text-base-content/60">
-              Mathematical trace step-by-step formula execution
-            </p>
-          </div>
-
-          <ol className="flex flex-col gap-4 text-xs">
-            <li className="flex flex-col gap-1.5 rounded-md bg-base-200/40 p-4 border border-base-200">
-              <span className="font-semibold opacity-70">1. Compulsory Grade Point Sum</span>
-              <div className="font-mono text-xs font-bold text-base-content">
-                {result.compulsory.map((r) => r.gradePoint.toFixed(2)).join(" + ")}{" "}
-                = <span className="text-primary">{result.compulsorySum.toFixed(2)}</span>
-              </div>
-            </li>
-
-            <li className="flex flex-col gap-1.5 rounded-md bg-base-200/40 p-4 border border-base-200">
-              <span className="font-semibold opacity-70">
-                2. Optional Subject Bonus (Points above 2.00)
-              </span>
-              <div className="font-mono text-xs font-bold text-base-content">
-                max(0, {result.optionalGradePoint.toFixed(2)} - 2.00) ={" "}
-                <span className="text-primary">{result.optionalBonus.toFixed(2)}</span>
-              </div>
-            </li>
-
-            <li className="flex flex-col gap-1.5 rounded-md bg-base-200/40 p-4 border border-base-200">
-              <span className="font-semibold opacity-70">3. Average Over 6 Subjects</span>
-              <div className="font-mono text-xs font-bold text-base-content">
-                ({result.compulsorySum.toFixed(2)} + {result.optionalBonus.toFixed(2)}) / 6 ={" "}
-                <span className="text-primary">{formatGpa(rawGpa)}</span>
-                {wasCapped && (
-                  <span className="ml-2 rounded-md bg-sky-500/20 px-2 py-0.5 text-[0.65rem] font-bold text-sky-700 dark:text-sky-300">
-                    Capped at 5.00 (R-13)
-                  </span>
-                )}
-              </div>
-            </li>
-
-            <li className="flex flex-col gap-1.5 rounded-md bg-base-200/40 p-4 border border-base-200">
-              <span className="font-semibold opacity-70">4. Uncancelled Benchmark GPA</span>
-              <div className="font-mono text-xs font-bold text-base-content">
-                <span>{formatGpa(result.uncancelledGpa)}</span>
-                {result.averageMark !== null && (
-                  <span className="ml-2 opacity-65 font-normal">
-                    (Mean raw mark: {result.averageMark.toFixed(2)} / 100)
-                  </span>
-                )}
-              </div>
-            </li>
-
-            <li className="flex flex-col gap-1.5 rounded-md p-4 border font-semibold">
-              <span className="opacity-75">5. Final Status Outcome</span>
-              <div
-                className={`rounded-md p-3 font-mono text-xs ${
-                  result.passed
-                    ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30"
-                    : "bg-rose-500/15 text-rose-800 dark:text-rose-300 border border-rose-500/30"
-                }`}
+        <section className="flex flex-col gap-5">
+          <SectionHeader title="How the GPA was reached" meta="R-13" />
+          <ol className="gp-card flex flex-col p-5 sm:p-6">
+            {steps.map((step, i) => (
+              <li
+                key={step.label}
+                className={`flex flex-col gap-1.5 py-4 ${i > 0 ? "border-t" : "pt-0"}`}
+                style={{ borderColor: "var(--gp-rule)" }}
               >
-                {result.passed ? (
-                  <>
-                    Clean Pass &rarr; Final GPA <strong>{formatGpa(result.gpa)}</strong>, Letter Grade <strong>{result.letter}</strong>
-                  </>
-                ) : (
-                  <>
-                    Compulsory Fail &rarr; Final GPA <strong>0.00</strong>, Letter Grade <strong>F</strong>
-                  </>
-                )}
-              </div>
-            </li>
+                <span className="flex items-baseline gap-2">
+                  <span className="gp-label-muted">
+                    {String(i + 1).padStart(3, "0")}
+                  </span>
+                  <span className="gp-label">{step.label}</span>
+                </span>
+                <span className="gp-num pl-8 text-sm">{step.value}</span>
+              </li>
+            ))}
           </ol>
         </section>
 
-        {/* Office Manual Check Card */}
-        <section className="rounded-lg border border-base-300 bg-base-100 p-8 shadow-xs">
-          <div className="border-b border-base-200 pb-5 mb-6">
-            <h2 className="text-xl font-bold text-base-content">
-              Office Verification Checklist
-            </h2>
-            <p className="text-xs text-base-content/60">
-              Rules and condition flags triggered for administrative audit
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-4">
+        <section className="flex flex-col gap-5">
+          <SectionHeader
+            title="What the office should check"
+            meta={listFlags.length > 0 ? `${listFlags.length} flags` : "clear"}
+          />
+          <div className="gp-card flex flex-col gap-5 p-5 sm:p-6">
             {result.impacts.length === 0 ? (
-              <div className="rounded-md bg-base-200/40 p-5 text-xs opacity-75">
-                No special boundary flags triggered. Standard grading rules applied.
-              </div>
+              <p className="gp-body">
+                Nothing here needs a second pair of eyes. The standard rules
+                covered every subject.
+              </p>
             ) : (
               <ul className="flex flex-col gap-3">
                 {result.impacts.map((line, i) => (
-                  <li
-                    key={i}
-                    className="rounded-md border border-base-200 bg-base-100 p-4 text-xs leading-relaxed text-base-content/90 font-medium shadow-xs"
-                  >
+                  <li key={i} className="gp-body">
                     {line}
                   </li>
                 ))}
               </ul>
             )}
 
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-base-200">
+            <div
+              className="flex flex-wrap items-center justify-between gap-3 border-t pt-4"
+              style={{ borderColor: "var(--gp-rule)" }}
+            >
               <div className="flex flex-wrap gap-2">
-                {result.flags.optionalDidNotHelp && (
-                  <span className="rounded-md px-2.5 py-1 text-xs font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
-                    Optional List
+                {listFlags.map((f) => (
+                  <span key={f} className="gp-flag">
+                    {f}
                   </span>
-                )}
-                {result.flags.practicalFail && (
-                  <span className="rounded-md px-2.5 py-1 text-xs font-semibold bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/30">
-                    Practical Fail List
-                  </span>
-                )}
-                {result.flags.absent && (
-                  <span className="rounded-md px-2.5 py-1 text-xs font-semibold bg-slate-500/15 text-slate-700 dark:text-slate-300 border border-slate-500/30">
-                    Absentee List
-                  </span>
+                ))}
+                {listFlags.length === 0 && (
+                  <span className="gp-label-muted">On no checking list</span>
                 )}
               </div>
-
-              <Link
-                href="/checking-lists"
-                className="btn btn-outline btn-xs rounded-md text-xs transition-colors duration-200"
-              >
-                Open Checking Lists &rarr;
+              <Link href="/checking-lists" className="gp-btn no-print">
+                Checking lists
               </Link>
             </div>
           </div>

@@ -1,19 +1,18 @@
+/**
+ * A letter grade. The reference palette is black, white and one yellow, so a
+ * grade reads as a mono glyph in a hairline box -- F and AB are the only ones
+ * that earn ink, because they are the ones the office acts on.
+ */
 const LETTER_CLASS: Record<string, string> = {
-  "A+": "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border-emerald-500/30",
-  A: "bg-teal-500/15 text-teal-800 dark:text-teal-300 border-teal-500/30",
-  "A-": "bg-sky-500/15 text-sky-800 dark:text-sky-300 border-sky-500/30",
-  B: "bg-indigo-500/15 text-indigo-800 dark:text-indigo-300 border-indigo-500/30",
-  C: "bg-amber-500/15 text-amber-800 dark:text-amber-300 border-amber-500/30",
-  D: "bg-orange-500/15 text-orange-800 dark:text-orange-300 border-orange-500/30",
-  F: "bg-rose-500/15 text-rose-800 dark:text-rose-300 border-rose-500/30",
-  AB: "bg-slate-500/15 text-slate-800 dark:text-slate-300 border-slate-500/30",
+  F: "gp-grade-strong",
+  AB: "gp-grade-strong",
 };
 
 const SIZE_CLASS: Record<string, string> = {
-  xs: "px-1.5 py-0.5 text-[0.65rem]",
-  sm: "px-2 py-0.5 text-xs",
-  md: "px-2.5 py-1 text-sm",
-  lg: "px-3 py-1.5 text-base font-bold",
+  xs: "min-w-[1.75rem] px-1 py-0.5 text-[0.65rem]",
+  sm: "min-w-[2rem] px-1.5 py-0.5 text-xs",
+  md: "min-w-[2.25rem] px-2 py-1 text-sm",
+  lg: "min-w-[2.75rem] px-2.5 py-1.5 text-base",
 };
 
 export function GradeBadge({
@@ -23,16 +22,11 @@ export function GradeBadge({
   letter: string;
   size?: "xs" | "sm" | "md" | "lg";
 }) {
-  const styles =
-    LETTER_CLASS[letter] ??
-    "bg-base-300/40 text-base-content border-base-300/60";
-
   return (
     <span
-      className={`inline-flex items-center justify-center rounded-md border font-semibold leading-none ${SIZE_CLASS[size]} ${styles}`}
+      className={`gp-grade inline-flex items-center justify-center rounded-[4px] ${SIZE_CLASS[size]} ${LETTER_CLASS[letter] ?? ""}`}
     >
       {letter}
     </span>
   );
 }
-

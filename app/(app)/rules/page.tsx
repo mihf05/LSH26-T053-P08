@@ -1,202 +1,149 @@
-import { GRADE_TABLE, GPA_LETTER_TABLE } from "@/lib/grading";
 import { GradeBadge } from "@/components/GradeBadge";
+import { PageHeader, SectionHeader } from "@/components/PageHeader";
+import { GPA_LETTER_TABLE, GRADE_TABLE } from "@/lib/grading";
 
-export const metadata = { title: "Rules | Result Processing" };
+export const metadata = { title: "Rules | GradePoint" };
 
 const RULES = [
   {
     id: "R-11",
-    title: "Theory & Practical Pass Thresholds",
-    body: "Theory is out of 75 with a pass threshold of 25 (33%). Practical is out of 25 with a pass threshold of 8 (32%). Failing either part fails the entire subject (grade point 0.00), regardless of total score. Non-practical subjects are marked out of 100 with a pass threshold of 33.",
+    title: "Theory and practical pass marks",
+    body: "Theory is out of 75 and passes at 25. Practical is out of 25 and passes at 8. Failing either part fails the whole subject at 0.00 grade points, however high the total. A subject with no practical is out of 100 and passes at 33.",
   },
   {
     id: "R-12",
-    title: "Absence (AB) Handling",
-    body: "An absence in a compulsory subject outputs AB, assigns grade point 0.00, and sets the overall result to F. An absence in an optional subject contributes 0 bonus points and triggers a flag on the administrative checking list.",
+    title: "What an absence does",
+    body: "An absence in a compulsory subject prints AB, scores 0.00 and cancels the result to F. An absence in the optional subject adds no bonus and puts the student on the checking list.",
   },
   {
     id: "R-13",
-    title: "GPA Formula & Cancellation Rule",
-    body: "GPA = (compulsory grade points sum + max(0, optional grade point - 2)) / 6, capped at 5.00 (rounded to 2 decimal places). Any compulsory failure cancels the result to GPA 0.00 and Letter F, while raw uncancelled GPA remains visible in trace audits.",
+    title: "The GPA formula, and cancellation",
+    body: "GPA is the compulsory grade points plus max(0, optional − 2), divided by 6, capped at 5.00 and rounded to two places. Any compulsory failure cancels it to 0.00 and F — the uncancelled figure stays visible in the trace so the drop can be explained.",
   },
   {
     id: "R-10",
-    title: "Grade Point & Letter Grade Mapping",
-    body: "Individual subject grade points are derived from total subject marks out of 100 using the standard scale. Final cohort letter grades are determined by overall calculated GPA.",
+    title: "Marks to grade points, GPA to letters",
+    body: "A subject's grade point comes from its total mark out of 100. The final letter comes from the overall GPA. Both tables are below.",
   },
   {
     id: "R-29",
-    title: "Administrative Checking Lists",
-    body: "Optional List: optional grade point ≤ 2.00 or AB. Practical Fail List: practical score < 8 in any subject. Absentee List: AB in any course. Students triggering multiple thresholds appear on all relevant lists.",
+    title: "Who lands on a checking list",
+    body: "Optional list: optional grade point of 2.00 or below, or AB. Practical fail list: practical under 8 in any subject. Absentee list: AB anywhere. A student who trips more than one appears on each.",
   },
 ];
 
 export default function RulesPage() {
   return (
-    <div className="flex flex-col gap-10">
-      {/* Page Header Banner */}
-      <div className="relative overflow-hidden rounded-lg border border-base-300 bg-base-100 p-8 sm:p-10 shadow-xs">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center rounded-md bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-700 dark:text-indigo-300">
-              Technical Specification
-            </span>
-            <span className="text-xs text-base-content/60 font-medium">
-              Grade Calculation Protocol
-            </span>
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">
-            GPA & Marking Rules Engine
-          </h1>
-          <p className="max-w-3xl text-sm opacity-75 leading-relaxed">
-            Formal rule definitions enforced by the calculation engine in{" "}
-            <code className="rounded-md bg-base-200 px-2 py-0.5 font-mono text-xs">
-              lib/grading.ts
-            </code>
-            . Every audit trace links directly back to these rule identifiers.
-          </p>
-        </div>
-      </div>
+    <div className="flex flex-col gap-12">
+      <PageHeader eyebrow="5 rules · enforced in lib/grading.ts" title="The rules the engine runs on">
+        Every grade point on this site cites one of these, so a result can
+        always be argued back to the rule that produced it.
+      </PageHeader>
 
-      {/* Rules Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {RULES.map((r) => (
-          <section
-            key={r.id}
-            className="card-hover flex flex-col justify-between rounded-lg border border-base-300 bg-base-100 p-6 shadow-xs transition-colors duration-300 hover:border-primary/50"
-          >
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between gap-3 border-b border-base-200 pb-4">
-                <span className="rounded-md bg-primary/10 px-2.5 py-1 font-mono text-xs font-bold text-primary border border-primary/20">
-                  {r.id}
-                </span>
-                <span className="text-[0.7rem] font-semibold tracking-wider uppercase opacity-50">
-                  Rule Standard
-                </span>
-              </div>
-              <h2 className="text-base font-bold text-base-content">{r.title}</h2>
-              <p className="text-xs leading-relaxed opacity-80">{r.body}</p>
-            </div>
+          <section key={r.id} className="gp-card flex flex-col gap-4 p-5">
+            <span className="gp-pill-quiet self-start">{r.id}</span>
+            <h2 className="gp-h2">{r.title}</h2>
+            <p className="gp-body">{r.body}</p>
           </section>
         ))}
       </div>
 
-      {/* Implementation Notes Callout */}
-      <div className="rounded-lg border border-sky-500/30 bg-sky-500/10 p-8 text-sky-900 dark:text-sky-200 shadow-xs">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <span className="rounded-md bg-sky-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wider">
-              Specification Clarifications
-            </span>
+      <div className="grid gap-8 md:grid-cols-2">
+        <section className="flex flex-col gap-4">
+          <SectionHeader title="Subject mark to grade point" meta="R-10">
+            The mark out of 100 for one subject.
+          </SectionHeader>
+          <div className="gp-card overflow-x-auto p-5 sm:p-6">
+            <table className="gp-table table-tight w-full text-left text-sm">
+              <thead>
+                <tr>
+                  <th className="px-0 py-2">Marks</th>
+                  <th className="px-3 py-2 text-right">Grade point</th>
+                  <th className="px-3 py-2 text-right">Letter</th>
+                </tr>
+              </thead>
+              <tbody>
+                {GRADE_TABLE.map((row) => (
+                  <tr key={row.letter}>
+                    <td className="gp-num px-0 py-3">
+                      {row.min}–{row.max}
+                    </td>
+                    <td className="gp-num px-3 py-3 text-right">
+                      {row.point.toFixed(2)}
+                    </td>
+                    <td className="px-3 py-3 text-right">
+                      <GradeBadge letter={row.letter} size="sm" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <div className="grid gap-6 text-xs leading-relaxed sm:grid-cols-2">
-            <div className="flex flex-col gap-1.5">
-              <span className="font-bold text-sm">Subject Grade Point Scale</span>
-              <p className="opacity-90">
-                Subject grade points are derived from standard mark bandings matching the final GPA letter grade thresholds.
-              </p>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <span className="font-bold text-sm">Non-Practical Coursework</span>
-              <p className="opacity-90">
-                Subjects without a practical component are evaluated out of 100 with a pass mark of 33, maintaining consistent 33% pass thresholds across all subjects.
-              </p>
-            </div>
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <SectionHeader title="GPA to final letter" meta="R-10">
+            The overall result, once every subject is in.
+          </SectionHeader>
+          <div className="gp-card overflow-x-auto p-5 sm:p-6">
+            <table className="gp-table table-tight w-full text-left text-sm">
+              <thead>
+                <tr>
+                  <th className="px-0 py-2">GPA</th>
+                  <th className="px-3 py-2 text-right">Letter</th>
+                </tr>
+              </thead>
+              <tbody>
+                {GPA_LETTER_TABLE.map((row) => (
+                  <tr key={row.letter}>
+                    <td className="gp-num px-0 py-3">
+                      {row.min === row.max
+                        ? row.min.toFixed(2)
+                        : `${row.min.toFixed(2)}–${row.max.toFixed(2)}`}
+                    </td>
+                    <td className="px-3 py-3 text-right">
+                      <GradeBadge letter={row.letter} size="sm" />
+                    </td>
+                  </tr>
+                ))}
+                <tr>
+                  <td className="px-0 py-3">
+                    <span className="gp-label">Any compulsory fail</span>
+                    <span className="gp-label-muted block">
+                      Overrides the table above (R-13)
+                    </span>
+                  </td>
+                  <td className="px-3 py-3 text-right">
+                    <GradeBadge letter="F" size="sm" />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <section className="gp-card flex flex-col gap-5 p-5 sm:p-6">
+        <span className="gp-label">Two things the spec leaves open</span>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <div className="flex flex-col gap-2">
+            <h3 className="gp-h2">Subject grade points</h3>
+            <p className="gp-body">
+              A subject&apos;s grade point uses the same mark bands as the final
+              letter grades, so one scale covers both.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <h3 className="gp-h2">Subjects without a practical</h3>
+            <p className="gp-body">
+              Marked out of 100 and passed at 33, which keeps the pass mark at
+              33% for every subject either way.
+            </p>
           </div>
         </div>
-      </div>
-
-      {/* Reference Tables */}
-      <div className="grid gap-8 md:grid-cols-2">
-        <section className="rounded-lg border border-base-300 bg-base-100 p-5 sm:p-8 shadow-xs">
-          <div className="border-b border-base-200 pb-5 mb-6">
-            <h2 className="text-xl font-bold text-base-content">
-              Subject Mark &rarr; Grade Point Scale (R-10)
-            </h2>
-            <p className="text-xs text-base-content/60">
-              Evaluation out of 100 total marks
-            </p>
-          </div>
-
-          <div className="overflow-hidden rounded-md border border-base-200">
-            <div className="overflow-x-auto">
-              <table className="table table-sm table-tight table-modern w-full">
-                <thead>
-                  <tr className="bg-base-200/50">
-                    <th className="font-semibold py-3 px-4">Mark Range</th>
-                    <th className="text-right font-semibold py-3 px-4">Grade Point</th>
-                    <th className="font-semibold py-3 px-4">Letter</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-base-200">
-                  {GRADE_TABLE.map((row) => (
-                    <tr key={row.letter} className="transition-colors duration-200 hover:bg-base-200/40">
-                      <td className="font-mono text-xs font-medium opacity-75 py-3 px-4">
-                        {row.min} - {row.max}
-                      </td>
-                      <td className="text-right font-mono text-xs font-bold text-primary py-3 px-4">
-                        {row.point.toFixed(2)}
-                      </td>
-                      <td className="py-3 px-4">
-                        <GradeBadge letter={row.letter} size="sm" />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <section className="rounded-lg border border-base-300 bg-base-100 p-5 sm:p-8 shadow-xs">
-          <div className="border-b border-base-200 pb-5 mb-6">
-            <h2 className="text-xl font-bold text-base-content">
-              Final GPA &rarr; Letter Grade Table (R-10)
-            </h2>
-            <p className="text-xs text-base-content/60">
-              Overall cohort classification
-            </p>
-          </div>
-
-          <div className="overflow-hidden rounded-md border border-base-200">
-            <div className="overflow-x-auto">
-              <table className="table table-sm table-tight table-modern w-full">
-                <thead>
-                  <tr className="bg-base-200/50">
-                    <th className="font-semibold py-3 px-4">Calculated GPA Range</th>
-                    <th className="font-semibold py-3 px-4">Letter Grade</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-base-200">
-                  {GPA_LETTER_TABLE.map((row) => (
-                    <tr key={row.letter} className="transition-colors duration-200 hover:bg-base-200/40">
-                      <td className="font-mono text-xs font-medium opacity-75 py-3 px-4">
-                        {row.min === row.max
-                          ? row.min.toFixed(2)
-                          : `${row.min.toFixed(2)} - ${row.max.toFixed(2)}`}
-                      </td>
-                      <td className="py-3 px-4">
-                        <GradeBadge letter={row.letter} size="sm" />
-                      </td>
-                    </tr>
-                  ))}
-                  <tr className="bg-rose-500/10 transition-colors duration-200 hover:bg-rose-500/15">
-                    <td className="font-mono text-xs font-bold text-rose-700 dark:text-rose-300 py-3 px-4">
-                      Compulsory Fail (R-13)
-                    </td>
-                    <td className="py-3 px-4">
-                      <GradeBadge letter="F" size="sm" />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <p className="mt-4 text-[0.72rem] opacity-65">
-            Note: Any compulsory subject failure overrides this table, forcing GPA to 0.00 and Letter Grade to F (R-13).
-          </p>
-        </section>
-      </div>
+      </section>
     </div>
   );
 }

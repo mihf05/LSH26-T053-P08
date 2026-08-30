@@ -1,44 +1,49 @@
+/**
+ * A single measure: mono label at the top, the number at the bottom in the
+ * display face, and an optional delta or note on the baseline beside it.
+ * Laid out like the metric tiles in the product UI on the landing page.
+ */
 export function StatCard({
   label,
   value,
+  unit,
   hint,
-  tone = "",
-  accentColor = "border-base-300",
-  icon,
+  delta,
+  accent = false,
 }: {
   label: string;
   value: string | number;
+  /** Rides on the number's baseline, e.g. "MWh", "/ 5.00". */
+  unit?: string;
+  /** Sits under the number, quiet. */
   hint?: string;
-  tone?: string;
-  accentColor?: string;
-  icon?: React.ReactNode;
+  /** Right of the number, in the data blue. */
+  delta?: string;
+  /** Fills the top-right block with the accent, for the one tile worth it. */
+  accent?: boolean;
 }) {
   return (
-    <div
-      className={`card-hover relative flex flex-col justify-between rounded-lg border bg-base-100 p-6 shadow-xs ${accentColor} transition-colors duration-300 hover:border-primary/50 top-gradient-border`}
-    >
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[0.72rem] font-bold tracking-wider uppercase text-base-content/80">
-            {label}
-          </span>
-          {icon && (
-            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 text-primary ring-1 ring-primary/20">
-              {icon}
-            </div>
-          )}
-        </div>
-        <div
-          className={`font-mono text-3xl font-extrabold tracking-tight sm:text-4xl ${tone}`}
-        >
-          {value}
-        </div>
+    <div className="gp-card flex min-h-[172px] flex-col justify-between gap-6 p-5">
+      <div className="flex items-start justify-between gap-3">
+        <span className="gp-label">{label}</span>
+        {accent && (
+          <span
+            className="gp-bar-accent block h-11 w-16 shrink-0 rounded-[4px]"
+            aria-hidden
+          />
+        )}
       </div>
-      {hint && (
-        <div className="mt-4 pt-3 border-t border-base-200 text-[0.72rem] font-medium text-base-content/80">
-          {hint}
+
+      <div className="flex flex-col gap-2">
+        <div className="flex items-baseline justify-between gap-3">
+          <span className="flex items-baseline gap-1.5">
+            <span className="gp-metric">{value}</span>
+            {unit && <span className="gp-unit">{unit}</span>}
+          </span>
+          {delta && <span className="gp-delta">{delta}</span>}
         </div>
-      )}
+        {hint && <span className="gp-label-muted">{hint}</span>}
+      </div>
     </div>
   );
 }

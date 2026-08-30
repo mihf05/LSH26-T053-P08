@@ -6,17 +6,18 @@ export default function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="bg-grid-pattern flex min-h-screen flex-col bg-base-200/50">
+    <div className="gp-canvas flex min-h-screen flex-col">
       <Navbar />
 
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-8 sm:py-10">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-8">
         {children}
       </main>
 
-      <footer className="no-print mx-auto w-full max-w-7xl px-4 pt-2 pb-10 text-xs opacity-60 sm:px-8">
-        Marks are stored raw in Neon Postgres. Every grade point, GPA and
-        checking list on this site is recomputed from those marks by the engine
-        in <code className="font-mono">lib/grading.ts</code>.
+      <footer className="no-print mx-auto w-full max-w-7xl px-4 pt-4 pb-10 sm:px-8">
+        <p className="gp-label-muted">
+          Marks are stored raw in Neon Postgres. Every grade point, GPA and
+          checking list is recomputed from those marks by lib/grading.ts.
+        </p>
       </footer>
     </div>
   );

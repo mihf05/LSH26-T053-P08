@@ -1,32 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { GradeBadge } from "@/components/GradeBadge";
 import { Pagination } from "@/components/Pagination";
 import { formatGpa, type StudentResult } from "@/lib/grading";
 
-interface ListSectionProps {
-  id: string;
-  title: string;
-  rule: string;
-  description: string;
-  rows: StudentResult[];
-  toneClass: string;
-  badgeBg: string;
-  type: "optional" | "practical" | "absent";
-}
-
+/** One checking list. The note column is the point of the screen: it says what
+ *  the teacher should look at, in the same words the rule uses. */
 export function ListSection({
   id,
   title,
   rule,
   description,
   rows,
-  toneClass,
-  badgeBg,
   type,
-}: ListSectionProps) {
+}: {
+  id: string;
+  title: string;
+  rule: string;
+  description: string;
+  rows: StudentResult[];
+  type: "optional" | "practical" | "absent";
+}) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
@@ -41,172 +37,158 @@ export function ListSection({
   const renderDetail = (r: StudentResult) => {
     if (type === "optional") {
       return r.optional?.isAbsent
-        ? `${r.optional.subject.name}: AB (Absent), grade point 0.00, bonus +0.00`
-        : `${r.optional?.subject.name}: ${r.optional?.displayMark} marks, grade point ${r.optionalGradePoint.toFixed(2)}, bonus max(0, ${r.optionalGradePoint.toFixed(2)} - 2.00) = +0.00`;
+        ? `${r.optional.subject.name}: absent, so 0.00 grade points and no bonus`
+        : `${r.optional?.subject.name}: ${r.optional?.displayMark} marks, ${r.optionalGradePoint.toFixed(2)} grade points, bonus max(0, ${r.optionalGradePoint.toFixed(2)} − 2.00) = +0.00`;
     }
     if (type === "practical") {
       return r.practicalFailures
         .map(
           (s) =>
-            `${s.subject.name}: practical ${s.practicalMark}/${s.subject.practicalFull} (pass threshold ${s.subject.practicalPass}), theory ${s.theoryMark}/${s.subject.theoryFull} passed`,
+            `${s.subject.name}: practical ${s.practicalMark}/${s.subject.practicalFull}, under the ${s.subject.practicalPass} pass mark — theory passed at ${s.theoryMark}/${s.subject.theoryFull}`,
         )
         .join("; ");
     }
     return r.absences
       .map(
         (s) =>
-          `${s.subject.name} (${s.subject.isOptional ? "optional: bonus +0.00" : "compulsory: overall result F"})`,
+          `${s.subject.name} — ${s.subject.isOptional ? "optional, so no bonus" : "compulsory, so the result is F"}`,
       )
       .join("; ");
   };
 
+  /** The other lists this student also appears on. */
+  const alsoOn = (r: StudentResult) =>
+    [
+      r.flags.optionalDidNotHelp && id !== "optional" ? "opt" : null,
+      r.flags.practicalFail && id !== "practical" ? "prac" : null,
+      r.flags.absent && id !== "absent" ? "AB" : null,
+    ].filter(Boolean) as string[];
+
+  const empty = (
+    <span className="gp-body">No student is on this list. Nothing to check.</span>
+  );
+
   return (
-    <section
-      id={id}
-      className={`rounded-lg border bg-base-100 p-6 sm:p-8 shadow-xs ${toneClass} transition-colors duration-300 scroll-mt-24`}
-    >
-      <div className="flex flex-col gap-5">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-base-200 pb-5">
-          <div className="flex flex-wrap items-center gap-3">
-            <h2 className="text-xl font-bold text-base-content">{title}</h2>
-            <span className={`rounded-md px-3 py-1 text-xs font-bold ${badgeBg}`}>
-              {rows.length} Students
-            </span>
-            <span className="rounded-md bg-base-200 px-2.5 py-1 font-mono text-xs font-semibold text-base-content/75">
-              Rule {rule}
-            </span>
-          </div>
+    <section id={id} className="flex scroll-mt-24 flex-col gap-5">
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap items-baseline gap-3">
+          <h2 className="gp-h2">{title}</h2>
+          <span className="gp-pill">{rows.length} students</span>
+          <span className="gp-label-muted">{rule}</span>
         </div>
+        <p className="gp-body max-w-3xl">{description}</p>
+      </div>
 
-        <p className="text-xs leading-relaxed opacity-75">{description}</p>
+      <div className="flex flex-col gap-3 md:hidden">
+        {paginatedRows.map((r) => (
+          <div key={r.student.id} className="gp-card flex flex-col gap-3 p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-col gap-1">
+                <Link
+                  href={`/students/${r.student.id}`}
+                  className="gp-label underline-offset-4 hover:underline"
+                >
+                  {r.student.name}
+                </Link>
+                <span className="gp-label-muted">
+                  #{r.student.roll} · {r.student.className}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="gp-num text-sm">{formatGpa(r.gpa)}</span>
+                <GradeBadge letter={r.letter} size="sm" />
+              </div>
+            </div>
+            <p className="rule-text">{renderDetail(r)}</p>
+            {alsoOn(r).length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {alsoOn(r).map((f) => (
+                  <span key={f} className="gp-flag">
+                    {f}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+        {rows.length === 0 && (
+          <div className="gp-card p-8 text-center">{empty}</div>
+        )}
+      </div>
 
-        {/* Mobile Card Stack View (< md) */}
-        <div className="flex flex-col gap-4 md:hidden">
-          {paginatedRows.map((r) => (
-            <div
-              key={r.student.id}
-              className="rounded-md border border-base-200 bg-base-200/30 p-4 flex flex-col gap-2.5"
-            >
-              <div className="flex items-center justify-between">
-                <div>
+      <div className="gp-card hidden overflow-x-auto p-5 sm:p-6 md:block">
+        <table className="gp-table table-tight w-full text-left text-sm">
+          <thead>
+            <tr>
+              <th className="w-14 px-0 py-2">Roll</th>
+              <th className="px-3 py-2">Student</th>
+              <th className="px-3 py-2">Class</th>
+              <th className="px-3 py-2 text-right">GPA</th>
+              <th className="px-3 py-2">Grade</th>
+              <th className="px-3 py-2">What to check</th>
+              <th className="w-24 px-3 py-2">Also on</th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedRows.map((r) => (
+              <tr key={r.student.id}>
+                <td className="gp-num px-0 py-3 text-xs">#{r.student.roll}</td>
+                <td className="px-3 py-3 whitespace-nowrap">
                   <Link
                     href={`/students/${r.student.id}`}
-                    className="font-bold text-sm text-base-content hover:text-primary transition-colors"
+                    className="underline-offset-4 hover:underline"
                   >
                     {r.student.name}
                   </Link>
-                  <span className="block font-mono text-[0.7rem] opacity-60">
-                    Roll #{r.student.roll} &middot; {r.student.className}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-bold text-base-content">
-                    {formatGpa(r.gpa)}
-                  </span>
+                </td>
+                <td className="gp-label-muted px-3 py-3">
+                  {r.student.className}
+                </td>
+                <td className="gp-num px-3 py-3 text-right">
+                  {formatGpa(r.gpa)}
+                </td>
+                <td className="px-3 py-3">
                   <GradeBadge letter={r.letter} size="sm" />
-                </div>
-              </div>
-
-              <div className="text-xs text-base-content/85 bg-base-100 p-2.5 rounded-md border border-base-200 leading-relaxed font-medium">
-                {renderDetail(r)}
-              </div>
-            </div>
-          ))}
-          {rows.length === 0 && (
-            <div className="py-6 text-center text-sm opacity-60">
-              No student records present on this verification list.
-            </div>
-          )}
-        </div>
-
-        {/* Desktop Table View (>= md) */}
-        <div className="hidden md:block overflow-hidden rounded-md border border-base-200">
-          <div className="overflow-x-auto">
-            <table className="table table-sm table-tight table-modern w-full">
-              <thead>
-                <tr className="bg-base-200/50">
-                  <th className="w-16 font-semibold py-3 px-4">Roll</th>
-                  <th className="font-semibold py-3 px-4">Student Name</th>
-                  <th className="font-semibold py-3 px-4">Class</th>
-                  <th className="text-right font-semibold py-3 px-4">GPA</th>
-                  <th className="w-16 font-semibold py-3 px-4">Grade</th>
-                  <th className="font-semibold py-3 px-4">Verification Audit Notes</th>
-                  <th className="w-28 font-semibold py-3 px-4">Also On</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-base-200">
-                {paginatedRows.map((r) => (
-                  <tr key={r.student.id} className="transition-colors duration-200 hover:bg-base-200/40">
-                    <td className="font-mono text-xs font-semibold opacity-65 py-3.5 px-4">
-                      #{r.student.roll}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <Link
-                        href={`/students/${r.student.id}`}
-                        className="font-bold text-base-content hover:text-primary transition-colors duration-200 whitespace-nowrap"
-                      >
-                        {r.student.name}
-                      </Link>
-                    </td>
-                    <td className="text-xs opacity-75 py-3.5 px-4">{r.student.className}</td>
-                    <td className="text-right font-mono text-xs font-bold py-3.5 px-4">
-                      {formatGpa(r.gpa)}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <GradeBadge letter={r.letter} size="sm" />
-                    </td>
-                    <td className="rule-text max-w-lg text-xs leading-relaxed opacity-85 py-3.5 px-4">
-                      {renderDetail(r)}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <div className="flex flex-wrap gap-1">
-                        {r.flags.optionalDidNotHelp && id !== "optional" && (
-                          <span className="rounded-md px-1.5 py-0.5 text-[0.65rem] font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/20">
-                            opt
-                          </span>
-                        )}
-                        {r.flags.practicalFail && id !== "practical" && (
-                          <span className="rounded-md px-1.5 py-0.5 text-[0.65rem] font-semibold bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/20">
-                            prac
-                          </span>
-                        )}
-                        {r.flags.absent && id !== "absent" && (
-                          <span className="rounded-md px-1.5 py-0.5 text-[0.65rem] font-semibold bg-slate-500/15 text-slate-700 dark:text-slate-300 border border-slate-500/20">
-                            AB
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {rows.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="py-10 text-center text-sm opacity-60"
-                    >
-                      No student records present on this verification list.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Section Pagination */}
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          pageSize={pageSize}
-          totalItems={rows.length}
-          onPageChange={(p) => setPage(p)}
-          onPageSizeChange={(sz) => {
-            setPageSize(sz);
-            setPage(1);
-          }}
-        />
+                </td>
+                <td className="rule-text max-w-lg px-3 py-3">
+                  {renderDetail(r)}
+                </td>
+                <td className="px-3 py-3">
+                  <div className="flex flex-wrap gap-1">
+                    {alsoOn(r).map((f) => (
+                      <span key={f} className="gp-flag">
+                        {f}
+                      </span>
+                    ))}
+                    {alsoOn(r).length === 0 && (
+                      <span className="gp-label-muted">—</span>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-3 py-10 text-center">
+                  {empty}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        totalItems={rows.length}
+        onPageChange={setPage}
+        onPageSizeChange={(sz) => {
+          setPageSize(sz);
+          setPage(1);
+        }}
+      />
     </section>
   );
 }

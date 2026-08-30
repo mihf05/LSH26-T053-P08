@@ -10,7 +10,7 @@ export const THEMES = [
 
 export type Theme = (typeof THEMES)[number];
 
-export const DEFAULT_THEME: Theme = "black";
+export const DEFAULT_THEME: Theme = "light";
 
 /** Where the chosen theme is remembered, and the attribute it is written to. */
 export const THEME_STORAGE_KEY = "theme";
