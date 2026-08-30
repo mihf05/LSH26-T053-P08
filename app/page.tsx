@@ -105,8 +105,8 @@ export default function LandingPage() {
               </p>
             </div>
             <div className="flex flex-col items-center gap-[16px] sm:flex-row">
-              <ButtonPrimary href="/rules" label="View rules" />
               <ButtonPrimary href="/dashboard" label="Open dashboard" />
+              <ButtonPrimary href="/rules" label="View rules" />
             </div>
           </div>
           <div className="relative aspect-[960/608] w-full max-w-[960px] rounded-[24px] border-2 border-solid border-black">

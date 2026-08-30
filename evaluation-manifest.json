@@ -37,10 +37,11 @@
             "github_username": "mihf05",
             "major_contribution": "Full-stack development of Next.js GPA Engine application, pure grading engine logic, database schema, seed scripts, rule verification suite, and UI implementation.",
             "evidence_paths_or_commits": [
-                "lib/grading.ts",
-                "app/(app)",
-                "scripts/seed.mjs",
-                "scripts/verify.mjs"
+                "lib/",
+                "app/",
+                "scripts/",
+                "components/",
+                "db"
             ]
         },
         {
@@ -49,7 +50,8 @@
             "major_contribution": "Frontend design, page layouts, components styling, and verification.",
             "evidence_paths_or_commits": [
                 "components/",
-                "app/globals.css"
+                "app/globals.css",
+                "app/"
             ]
         }
     ],
