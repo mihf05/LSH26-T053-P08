@@ -1,6 +1,44 @@
 @import "tailwindcss";
+/* All 35 daisyUI themes are enabled so the picker in the navbar can offer
+   every one of them. corporate is the default; business is used when the
+   browser asks for dark and the reader has not chosen a theme yet. */
 @plugin "daisyui" {
-  themes: corporate --default, business --prefersdark;
+  themes:
+    corporate --default,
+    business --prefersdark,
+    light,
+    dark,
+    abyss,
+    acid,
+    aqua,
+    autumn,
+    black,
+    bumblebee,
+    caramellatte,
+    cmyk,
+    coffee,
+    cupcake,
+    cyberpunk,
+    dim,
+    dracula,
+    emerald,
+    fantasy,
+    forest,
+    garden,
+    halloween,
+    lemonade,
+    lofi,
+    luxury,
+    night,
+    nord,
+    pastel,
+    retro,
+    silk,
+    sunset,
+    synthwave,
+    valentine,
+    winter,
+    wireframe;
 }
 
 @theme {
