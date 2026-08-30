@@ -21,7 +21,7 @@ export type LandingAsset = {
 
 export const LANDING_ASSETS: LandingAsset[] = [
   {
-    file: "hero.png",
+    file: "hero.jpg",
     id: "8e2dd113-d801-4d41-b661-5b8fb95ca985",
     format: "png",
     width: 960,

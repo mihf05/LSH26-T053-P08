@@ -111,7 +111,7 @@ export default function LandingPage() {
           </div>
           <div className="relative aspect-[960/608] w-full max-w-[960px] rounded-[24px] border-2 border-solid border-black">
             <img
-              src={asset("hero.png")}
+              src={asset("hero.jpg")}
               alt="The result dashboard showing the grade distribution, pass rate and the students on the checking lists"
               className="absolute inset-0 size-full rounded-[24px] object-cover"
             />
