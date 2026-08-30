@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ButtonPrimary, ButtonSecondary } from "@/components/landing/Buttons";
+import { ButtonPrimary } from "@/components/landing/Buttons";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { asset } from "@/lib/landing-assets";
 
@@ -50,27 +50,6 @@ const VALUES = [
     icon: "icon-3.svg",
     title: "The hard edges come first",
     body: "Practical fails, absences and a weak optional subject are the cases the engine is built to get right.",
-  },
-];
-
-const JOURNAL = [
-  {
-    image: "journal-1.svg",
-    title: "Failing either part fails the whole subject",
-    tag: "R-11",
-    read: "2 min",
-  },
-  {
-    image: "journal-2.svg",
-    title: "What an absence does to the optional subject",
-    tag: "R-12",
-    read: "3 min",
-  },
-  {
-    image: "journal-3.svg",
-    title: "Why a 74.43 average can still come out as F",
-    tag: "R-13",
-    read: "4 min",
   },
 ];
 
