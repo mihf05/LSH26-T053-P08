@@ -1,4 +1,4 @@
-# GradePoint — School Result Processing & GPA Engine
+# GradePoint — School Result Processing & GPA Engine 
 
 Solution for **LSH26 Hackathon 2026 — P08**
 
