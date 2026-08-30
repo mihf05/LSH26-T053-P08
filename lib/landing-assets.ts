@@ -30,7 +30,7 @@ export const LANDING_ASSETS: LandingAsset[] = [
     description: "Hero product screenshot",
   },
   {
-    file: "feature.png",
+    file: "feature.svg",
     id: "834d3a97-974d-40e1-adb6-f6fbc40636a3",
     format: "png",
     width: 693,

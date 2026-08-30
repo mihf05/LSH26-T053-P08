@@ -125,7 +125,7 @@ export default function LandingPage() {
           <div className="flex w-full max-w-[1500px] flex-col items-center gap-[40px] lg:flex-row">
             <div className="relative aspect-[693/502] w-full shrink-0 lg:w-[693px]">
               <img
-                src={asset("feature.png")}
+                src={asset("feature.svg")}
                 alt="A subject trace showing the mark used, the grade point and the rule that decided it"
                 className="absolute inset-0 size-full object-cover"
               />
