@@ -44,6 +44,12 @@
 @theme {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  /* Landing page families, taken from the Figma design. Source Serif 4 is the
+     current Google release of the family the design names "Source Serif Pro". */
+  --font-serif-display:
+    var(--font-source-serif), "Source Serif Pro", Georgia, serif;
+  --font-display:
+    var(--font-radio-canada-big), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* The rule column of a trace is prose, not data -- keep it readable but quiet. */

@@ -108,7 +108,8 @@ assertions.
 
 ## Pages
 
-- `/` — cohort summary, grade distribution, and the edge cases with their reasons
+- `/` — the landing page, built from the Figma design (see below)
+- `/dashboard` — cohort summary, grade distribution, and the edge cases with their reasons
 - `/students` — all students, filterable by class, result and checking list; a
   cancelled GPA shows the uncancelled figure beside it and names the subject
   that cancelled it
@@ -116,14 +117,45 @@ assertions.
 - `/checking-lists` — the three lists, with what to verify on each row
 - `/rules` — the rules and both grade tables
 
+## Landing page
+
+`/` is a single page landing built from the Figma design
+`QMI63rM4YzUCDpN91OtS6Z`, node `1:265` ("Desktop"). It reproduces that frame's
+type scale, spacing, colours and layout; the copy is the result processing
+system's rather than the template's, kept at the same line lengths so the
+design's block heights hold.
+
+Measured against the frame at 1280px: hero 960x608, feature image 693x502, case
+study image 498x280, testimonial image 612x700, value card 403x246, footer band
+1240x280, and a total page height of 5666px against the design's 5646px. The
+remaining few pixels come from Source Serif 4 (the current Google release of the
+family the design names "Source Serif Pro") having slightly different line
+metrics.
+
+Three families are loaded through `next/font/google`: Source Serif 4, Radio
+Canada Big and Geist Mono. Their CSS variables are declared on `<html>` so that
+the families in the `@theme` block, which Tailwind emits at `:root`, can resolve
+them.
+
+The images are **not** in the repository. Fetch them with:
+
+```bash
+npm run assets:landing
+```
+
+See `public/landing/README.md` and the manifest in `lib/landing-assets.ts` for
+the file names, sizes and the Figma layer each one comes from.
+
 ## Themes
 
-All 35 daisyUI themes are enabled. The picker in the navbar lists every one of
-them with a live four-colour swatch, and the choice is remembered in
+All 35 daisyUI themes are enabled across the result processing screens. The
+picker in that navbar lists every one of them with a live four-colour swatch, and the choice is remembered in
 `localStorage`. An inline script in `app/layout.tsx` applies the remembered
 theme before the first paint, so navigating does not flash the default.
 
 `lib/themes.ts` holds the list; it must stay in step with the `themes:` line in
 `app/globals.css`, since a name in the picker that is not enabled in the CSS
 falls back to the default theme. The default is `corporate`, with `business`
-used when the browser asks for dark and the reader has not chosen one.
+used when the browser asks for dark and the reader has not chosen one. The
+landing page is deliberately outside this system: it paints the design's own
+literal colours so a theme cannot alter it.
